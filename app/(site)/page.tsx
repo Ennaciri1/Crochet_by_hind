@@ -1,0 +1,114 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import AdSlot from "@/components/AdSlot";
+import { CategoryTiles } from "@/components/CategoryNav";
+import CoverImage from "@/components/CoverImage";
+import JsonLd from "@/components/JsonLd";
+import { PostGrid } from "@/components/PostCard";
+import YarnBall from "@/components/YarnBall";
+import { getCategory, yarnVars } from "@/lib/categories";
+import { getLatestPosts } from "@/lib/posts";
+import { absoluteUrl, site } from "@/lib/site";
+
+export const revalidate = 300; // ISR: rebuild at most every 5 minutes
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/", title: `${site.name} – Free Crochet Patterns`, description: site.description },
+};
+
+export default async function HomePage() {
+  const posts = await getLatestPosts(13);
+  const [newest, ...rest] = posts;
+  const newestCategory = newest ? getCategory(newest.category) : undefined;
+
+  return (
+    <>
+      {/* WebSite + SearchAction: lets Google show a search box for the site */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: site.name,
+          url: absoluteUrl("/"),
+          potentialAction: {
+            "@type": "SearchAction",
+            target: { "@type": "EntryPoint", urlTemplate: `${absoluteUrl("/search")}?q={search_term_string}` },
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
+
+      <div className="wrap">
+        <section className="hero">
+          <div className="hero-text">
+            <span className="eyebrow">Free crochet patterns · US terms</span>
+            <h1>
+              Happy little things to make with <span className="hl">cotton yarn</span> and a hook.
+            </h1>
+            <p className="hero-lede">
+              Clear, tested patterns for beginners and seasoned makers: amigurumi friends, cozy wearables and colorful
+              pieces for your home. Every pattern is free to read here.
+            </p>
+            <div className="hero-actions">
+              <Link className="btn btn-primary" href="/category/free-patterns">
+                Browse free patterns
+              </Link>
+              <a className="btn" href={site.etsy} target="_blank" rel="noopener">
+                Ad-free PDFs on Etsy
+              </a>
+            </div>
+          </div>
+
+          <div className="hero-art">
+            {/* Decorative yarn balls around the newest post */}
+            <YarnBall className="deco deco-1" color="var(--yarn-rose)" size={110} />
+            <YarnBall className="deco deco-2" color="var(--yarn-mint)" size={80} />
+            <YarnBall className="deco deco-3" color="var(--yarn-butter)" size={64} tail={false} />
+            <YarnBall className="deco deco-4" color="var(--yarn-lilac)" size={72} />
+
+            {newest ? (
+              <Link href={`/blog/${newest.slug}`} className="hero-feature" style={yarnVars(newestCategory?.color)}>
+                <div className="media">
+                  <CoverImage
+                    src={newest.cover_url}
+                    alt={newest.cover_alt || newest.title}
+                    sizes="(max-width: 860px) 90vw, 460px"
+                    priority
+                  />
+                </div>
+                <div className="hero-feature-text">
+                  <span className="chip">New · {newestCategory?.name}</span>
+                  <h2>{newest.title}</h2>
+                </div>
+              </Link>
+            ) : (
+              <div className="hero-feature hero-empty">
+                <YarnBall color="var(--yarn-sky)" size={160} />
+              </div>
+            )}
+          </div>
+        </section>
+
+        <CategoryTiles />
+
+        <hr className="stitch" />
+
+        <AdSlot format="display" />
+
+        <div className="section-head">
+          <h2>Latest patterns</h2>
+          <Link href="/category/free-patterns">See all →</Link>
+        </div>
+
+        {rest.length > 0 ? (
+          <PostGrid posts={rest} />
+        ) : (
+          <p className="empty">
+            {newest ? "More patterns are on the hook. Come back soon!" : "No posts yet. Write your first one in /admin."}
+          </p>
+        )}
+      </div>
+    </>
+  );
+}
