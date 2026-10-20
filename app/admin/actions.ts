@@ -36,6 +36,10 @@ async function requireAdmin() {
 /** After any change, refresh every public page (home, categories, posts, sitemap). */
 function refreshPublicPages() {
   revalidatePath("/", "layout");
+  // Metadata routes sit outside the layout tree, so they need purging by name:
+  // without this an unpublished post lingers in the sitemap until it expires.
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/robots.txt");
 }
 
 const text = (formData: FormData, key: string, max = 20000) => String(formData.get(key) ?? "").trim().slice(0, max);
