@@ -6,7 +6,17 @@ import { getPublicClient } from "./supabase/public";
  * metadataBase, canonical links, etc. during the build), so it stays an
  * env var rather than a DB setting.
  */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+function resolveSiteUrl() {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/+$/, "");
+  // Vercel sets this on every deployment, so canonical links and the sitemap stay
+  // correct even when NEXT_PUBLIC_SITE_URL was never added to the project.
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+  return "http://localhost:3000";
+}
+
+export const SITE_URL = resolveSiteUrl();
 export const SITE_LOCALE = "en_US";
 
 export type SiteSettings = {
