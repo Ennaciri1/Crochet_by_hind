@@ -1,9 +1,10 @@
 import Link from "next/link";
 import YarnBall from "./YarnBall";
-import { categories, yarnVars } from "@/lib/categories";
+import type { Category } from "@/lib/categories";
+import { yarnVars } from "@/lib/categories";
 
 /** Small colored category buttons, each with its own yarn ball. */
-export function CategoryPills({ current }: { current?: string }) {
+export function CategoryPills({ categories, current }: { categories: Category[]; current?: string }) {
   return (
     <ul className="category-pills" aria-label="Categories">
       {categories.map((c) => (
@@ -23,7 +24,7 @@ export function CategoryPills({ current }: { current?: string }) {
 }
 
 /** Big colored tiles for the homepage: one yarn ball per category. */
-export function CategoryTiles() {
+export function CategoryTiles({ categories }: { categories: Category[] }) {
   return (
     <ul className="category-tiles" aria-label="Categories">
       {categories.map((c) => (

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { categories } from "@/lib/categories";
+import { getCategories } from "@/lib/categories";
 import { getAllPublishedSlugs } from "@/lib/posts";
 import { absoluteUrl } from "@/lib/site";
 
@@ -7,7 +7,7 @@ export const revalidate = 300;
 
 /** /sitemap.xml — home, categories, every published post and the legal pages. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPublishedSlugs();
+  const [posts, categories] = await Promise.all([getAllPublishedSlugs(), getCategories()]);
   const now = new Date();
 
   return [

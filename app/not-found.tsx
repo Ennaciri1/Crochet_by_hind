@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getCategories } from "@/lib/categories";
+import { getSiteSettings } from "@/lib/site";
 
 /** Custom 404 page (shown for any unknown URL). */
-export default function NotFound() {
+export default async function NotFound() {
+  const [site, categories] = await Promise.all([getSiteSettings(), getCategories()]);
   return (
     <>
-      <Header />
+      <Header siteName={site.name} categories={categories} />
       <main id="main" className="wrap">
         <div className="not-found read">
           <p className="big">404</p>
@@ -26,7 +29,7 @@ export default function NotFound() {
           </Link>
         </div>
       </main>
-      <Footer />
+      <Footer site={site} categories={categories} />
     </>
   );
 }

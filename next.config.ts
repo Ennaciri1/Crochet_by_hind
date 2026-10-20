@@ -10,6 +10,8 @@ const supabaseHost = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  // The bulk importer posts batches of rows; a long pattern easily passes the 1 MB default.
+  experimental: { serverActions: { bodySizeLimit: "8mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85],

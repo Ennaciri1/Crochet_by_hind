@@ -13,12 +13,10 @@ type Props = {
   /** "display" = responsive banner, "in-article" = native ad between paragraphs */
   format?: "display" | "in-article";
   className?: string;
-};
-
-const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
-const slots = {
-  display: process.env.NEXT_PUBLIC_ADSENSE_SLOT_DISPLAY || "",
-  "in-article": process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE || "",
+  /** AdSense client id and slot ids, from /admin/settings (passed down by the server component parent). */
+  client?: string;
+  slotDisplay?: string;
+  slotInArticle?: string;
 };
 
 /**
@@ -26,8 +24,14 @@ const slots = {
  * - Development: shows a dashed placeholder so you can see where ads go.
  * - Production without ids: renders nothing.
  */
-export default function AdSlot({ format = "display", className = "" }: Props) {
-  const slot = slots[format];
+export default function AdSlot({
+  format = "display",
+  className = "",
+  client = "",
+  slotDisplay = "",
+  slotInArticle = "",
+}: Props) {
+  const slot = format === "in-article" ? slotInArticle : slotDisplay;
   const ref = useRef<HTMLModElement>(null);
   const pathname = usePathname();
   const isDev = process.env.NODE_ENV !== "production";
@@ -48,7 +52,7 @@ export default function AdSlot({ format = "display", className = "" }: Props) {
     return (
       <aside className={`ad ${className}`} aria-label="Advertisement">
         <span className="ad-label">Advertisement</span>
-        <div className="ad-placeholder">Ad slot ({format}) — set your AdSense ids in .env</div>
+        <div className="ad-placeholder">Ad slot ({format}) — set your AdSense ids in /admin/settings</div>
       </aside>
     );
   }

@@ -5,21 +5,22 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { CategoryPills } from "@/components/CategoryNav";
 import { PostGrid } from "@/components/PostCard";
 import YarnBall from "@/components/YarnBall";
-import { categories, getCategory, yarnVars } from "@/lib/categories";
+import { getCategories, getCategory, yarnVars } from "@/lib/categories";
 import { getPostsByCategory } from "@/lib/posts";
+import { getSiteSettings } from "@/lib/site";
 
 export const revalidate = 300;
-export const dynamicParams = false; // only the 5 known categories exist
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategory(slug);
+  const category = await getCategory(slug);
   if (!category) return {};
   const title = slug === "free-patterns" ? "Free Crochet Patterns" : `${category.name} Crochet Patterns`;
   return {
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const category = getCategory(slug);
+  const [category, categories, site] = await Promise.all([getCategory(slug), getCategories(), getSiteSettings()]);
   if (!category) notFound();
 
   const posts = await getPostsByCategory(slug);
@@ -48,7 +49,7 @@ export default async function CategoryPage({ params }: Props) {
           </div>
           <YarnBall color="var(--c)" size={120} className="category-head-ball" />
         </div>
-        <CategoryPills current={slug} />
+        <CategoryPills categories={categories} current={slug} />
       </header>
 
       <hr className="stitch" />
@@ -58,7 +59,12 @@ export default async function CategoryPage({ params }: Props) {
           <PostGrid posts={posts.slice(0, 6)} />
           {posts.length > 6 && (
             <>
-              <AdSlot format="display" />
+              <AdSlot
+                format="display"
+                client={site.adsEnabled ? site.adsenseClient : ""}
+                slotDisplay={site.adsenseSlotDisplay}
+                slotInArticle={site.adsenseSlotInArticle}
+              />
               <PostGrid posts={posts.slice(6)} />
             </>
           )}

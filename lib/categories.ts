@@ -1,40 +1,61 @@
-/** The 5 blog categories. The slug is stored in the database; each has its own yarn color. */
-export const categories = [
+import { cache } from "react";
+import { getPublicClient } from "./supabase/public";
+
+export type Category = {
+  id?: string;
+  slug: string;
+  color: string;
+  name: string;
+  description: string;
+  sort_order?: number;
+};
+
+/** Fallback list, used when the DB table is empty/unavailable (e.g. before running schema.sql). */
+const fallbackCategories: Category[] = [
   {
     slug: "free-patterns",
-    color: "rose", // cotton yarn color (see --yarn-rose in globals.css)
+    color: "rose",
     name: "Free patterns",
     description: "Free crochet patterns with clear US-term instructions, stitch counts and printable pattern cards.",
   },
   {
     slug: "amigurumi",
-    color: "butter", // cotton yarn color (see --yarn-butter in globals.css)
+    color: "butter",
     name: "Amigurumi",
     description: "Free amigurumi patterns: small crocheted animals, dolls and toys, worked in the round.",
   },
   {
     slug: "wearables",
-    color: "lilac", // cotton yarn color (see --yarn-lilac in globals.css)
+    color: "lilac",
     name: "Wearables",
     description: "Free crochet patterns for hats, scarves, sweaters, bags and other things you can wear.",
   },
   {
     slug: "home-decor",
-    color: "mint", // cotton yarn color (see --yarn-mint in globals.css)
+    color: "mint",
     name: "Home decor",
     description: "Free crochet patterns for blankets, pillows, coasters, baskets and cozy home accents.",
   },
   {
     slug: "tutorials",
-    color: "sky", // cotton yarn color (see --yarn-sky in globals.css)
+    color: "sky",
     name: "Tutorials",
     description: "Step-by-step crochet tutorials: stitches, techniques, reading patterns and finishing tips.",
   },
-] as const;
+];
 
-export type CategorySlug = (typeof categories)[number]["slug"];
+/** The blog categories, editable from /admin/categories. Cached per-request. */
+export const getCategories = cache(async (): Promise<Category[]> => {
+  const supabase = getPublicClient();
+  if (!supabase) return fallbackCategories;
 
-export function getCategory(slug: string | null | undefined) {
+  const { data } = await supabase.from("categories").select("*").order("sort_order", { ascending: true });
+  if (!data || data.length === 0) return fallbackCategories;
+  return data as Category[];
+});
+
+export async function getCategory(slug: string | null | undefined) {
+  const categories = await getCategories();
   return categories.find((c) => c.slug === slug);
 }
 

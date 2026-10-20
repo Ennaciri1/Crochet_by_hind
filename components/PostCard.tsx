@@ -3,8 +3,8 @@ import CoverImage from "./CoverImage";
 import { getCategory, yarnVars } from "@/lib/categories";
 import type { PostSummary } from "@/lib/types";
 
-export default function PostCard({ post, priority = false }: { post: PostSummary; priority?: boolean }) {
-  const category = getCategory(post.category);
+export default async function PostCard({ post, priority = false }: { post: PostSummary; priority?: boolean }) {
+  const category = await getCategory(post.category);
   return (
     <article className="card" style={yarnVars(category?.color)}>
       <div className="media">

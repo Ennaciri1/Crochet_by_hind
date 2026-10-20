@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
-import { site } from "@/lib/site";
+import { getSiteSettings } from "@/lib/site";
 
 /** Default social sharing image (used when a page has no cover photo). */
-export const alt = `${site.name} – Free crochet patterns`;
+export const alt = "Free crochet patterns";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const site = await getSiteSettings();
   return new ImageResponse(
     (
       <div

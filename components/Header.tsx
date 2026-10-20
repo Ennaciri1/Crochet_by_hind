@@ -1,9 +1,8 @@
 import Link from "next/link";
 import YarnBall from "./YarnBall";
-import { categories } from "@/lib/categories";
-import { site } from "@/lib/site";
+import type { Category } from "@/lib/categories";
 
-export default function Header() {
+export default function Header({ siteName, categories }: { siteName: string; categories: Category[] }) {
   return (
     <header className="site-header">
       <a href="#main" className="skip-link">
@@ -12,7 +11,7 @@ export default function Header() {
       <div className="wrap">
         <Link href="/" className="logo">
           <YarnBall className="logo-mark" color="var(--yarn-rose)" size={34} />
-          {site.name}
+          {siteName}
         </Link>
         <nav className="main-nav" aria-label="Main">
           {categories.map((c) => (

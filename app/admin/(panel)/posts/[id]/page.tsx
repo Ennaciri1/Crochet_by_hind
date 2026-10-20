@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getCategories } from "@/lib/categories";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Post } from "@/lib/types";
 import PostEditor from "../PostEditor";
@@ -16,9 +17,12 @@ export default async function EditPostPage({ params, searchParams }: Props) {
   const { saved } = await searchParams;
 
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+  const [{ data }, categories] = await Promise.all([
+    supabase.from("posts").select("*").eq("id", id).maybeSingle(),
+    getCategories(),
+  ]);
   if (!data) notFound();
 
   // key: re-mount the editor after each save so it shows the fresh data
-  return <PostEditor key={(data as Post).updated_at} post={data as Post} saved={saved} />;
+  return <PostEditor key={(data as Post).updated_at} post={data as Post} saved={saved} categories={categories} />;
 }

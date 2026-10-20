@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import StaticPage from "@/components/StaticPage";
-import { site } from "@/lib/site";
+import { getSiteSettings } from "@/lib/site";
 import ContactForm from "./ContactForm";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Get in touch with ${site.author} about patterns, collaborations or questions.`,
-  alternates: { canonical: "/contact" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  return {
+    title: "Contact",
+    description: `Get in touch with ${site.author} about patterns, collaborations or questions.`,
+    alternates: { canonical: "/contact" },
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await getSiteSettings();
   return (
     <StaticPage
       title="Contact"

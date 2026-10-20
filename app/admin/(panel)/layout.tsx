@@ -48,7 +48,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <nav aria-label="Admin">
             <Link href="/admin">Posts</Link>
             <Link href="/admin/posts/new">+ New post</Link>
+            <Link href="/admin/import">Import</Link>
             <Link href="/admin/messages">Messages</Link>
+            <Link href="/admin/settings">Settings</Link>
+            <Link href="/admin/categories">Categories</Link>
+            <Link href="/admin/pages">Pages</Link>
             <Link href="/" target="_blank">
               View site ↗
             </Link>

@@ -6,21 +6,24 @@ import CoverImage from "@/components/CoverImage";
 import JsonLd from "@/components/JsonLd";
 import { PostGrid } from "@/components/PostCard";
 import YarnBall from "@/components/YarnBall";
-import { getCategory, yarnVars } from "@/lib/categories";
+import { getCategories, getCategory, yarnVars } from "@/lib/categories";
 import { getLatestPosts } from "@/lib/posts";
-import { absoluteUrl, site } from "@/lib/site";
+import { absoluteUrl, getSiteSettings } from "@/lib/site";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  openGraph: { url: "/", title: `${site.name} – Free Crochet Patterns`, description: site.description },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  return {
+    alternates: { canonical: "/" },
+    openGraph: { url: "/", title: `${site.name} – Free Crochet Patterns`, description: site.description },
+  };
+}
 
 export default async function HomePage() {
-  const posts = await getLatestPosts(13);
+  const [posts, categories, site] = await Promise.all([getLatestPosts(13), getCategories(), getSiteSettings()]);
   const [newest, ...rest] = posts;
-  const newestCategory = newest ? getCategory(newest.category) : undefined;
+  const newestCategory = newest ? await getCategory(newest.category) : undefined;
 
   return (
     <>
@@ -90,11 +93,16 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <CategoryTiles />
+        <CategoryTiles categories={categories} />
 
         <hr className="stitch" />
 
-        <AdSlot format="display" />
+        <AdSlot
+          format="display"
+          client={site.adsEnabled ? site.adsenseClient : ""}
+          slotDisplay={site.adsenseSlotDisplay}
+          slotInArticle={site.adsenseSlotInArticle}
+        />
 
         <div className="section-head">
           <h2>Latest patterns</h2>

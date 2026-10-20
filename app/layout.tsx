@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Source_Serif_4 } from "next/font/google";
-import { adsense, site } from "@/lib/site";
+import { getSiteSettings, SITE_LOCALE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Fonts are self-hosted by next/font: no layout shift, no request to Google at runtime.
@@ -16,24 +16,27 @@ const grotesque = Bricolage_Grotesque({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: `${site.name} – Free Crochet Patterns`,
-    template: `%s | ${site.name}`,
-  },
-  description: site.description,
-  applicationName: site.name,
-  authors: [{ name: site.author }],
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    locale: site.locale,
-  },
-  twitter: { card: "summary_large_image" },
-  // AdSense site verification: <meta name="google-adsense-account" content="ca-pub-...">
-  other: adsense.client ? { "google-adsense-account": adsense.client } : {},
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: `${site.name} – Free Crochet Patterns`,
+      template: `%s | ${site.name}`,
+    },
+    description: site.description,
+    applicationName: site.name,
+    authors: [{ name: site.author }],
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      locale: SITE_LOCALE,
+    },
+    twitter: { card: "summary_large_image" },
+    // AdSense site verification: <meta name="google-adsense-account" content="ca-pub-...">
+    other: site.adsenseClient ? { "google-adsense-account": site.adsenseClient } : {},
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -42,8 +45,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${serif.variable} ${grotesque.variable}`}>
-      <body>{children}</body>
+    <html lang="en" className={`${serif.variable} ${grotesque.variable}`} suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -2,12 +2,13 @@ import PrintButton from "./PrintButton";
 import YarnBall from "./YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
 import { renderMarkdown } from "@/lib/markdown";
-import { site } from "@/lib/site";
+import { getSiteSettings, SITE_URL } from "@/lib/site";
 import type { Post } from "@/lib/types";
 import { difficultyLabel, parseAbbreviations } from "@/lib/utils";
 
 /** The printable pattern card. Not shown when `pattern` (instructions) is empty. */
-export default function PatternCard({ post }: { post: Post }) {
+export default async function PatternCard({ post }: { post: Post }) {
+  const [site, category] = await Promise.all([getSiteSettings(), getCategory(post.category)]);
   const facts = [
     { label: "Skill level", value: post.difficulty ? difficultyLabel[post.difficulty] : "" },
     { label: "Yarn", value: post.yarn },
@@ -24,7 +25,7 @@ export default function PatternCard({ post }: { post: Post }) {
       className="pattern-card"
       id="pattern-card"
       aria-labelledby="pattern-title"
-      style={yarnVars(getCategory(post.category)?.color)}
+      style={yarnVars(category?.color)}
     >
       <span id="pattern" />
       <div className="pattern-card-head">
@@ -76,7 +77,7 @@ export default function PatternCard({ post }: { post: Post }) {
       <div className="pattern-steps prose" dangerouslySetInnerHTML={{ __html: renderMarkdown(post.pattern) }} />
 
       <p className="pattern-copyright">
-        © {new Date(post.published_at ?? post.created_at).getUTCFullYear()} {site.author} · {site.url.replace(/^https?:\/\//, "")}
+        © {new Date(post.published_at ?? post.created_at).getUTCFullYear()} {site.author} · {SITE_URL.replace(/^https?:\/\//, "")}
         . You may sell items you make from this pattern; please credit {site.name}. Do not copy, share or sell the
         pattern itself.
       </p>

@@ -11,7 +11,7 @@ import YarnBall from "@/components/YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
 import { getToc, markdownToText, readingTime, renderArticleWithBreak } from "@/lib/markdown";
 import { getAllPublishedSlugs, getPostBySlug, getRelatedPosts } from "@/lib/posts";
-import { absoluteUrl, site } from "@/lib/site";
+import { absoluteUrl, getSiteSettings } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPostBySlug(slug);
   if (!post) return { title: "Post not found" };
 
+  const site = await getSiteSettings();
   const title = post.seo_title || post.title;
   const description = post.seo_description || post.excerpt || markdownToText(post.content).slice(0, 155);
   const image = post.cover_url ? absoluteUrl(post.cover_url) : undefined;
@@ -58,7 +59,7 @@ export default async function PostPage({ params }: Props) {
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const category = getCategory(post.category);
+  const [category, site] = await Promise.all([getCategory(post.category), getSiteSettings()]);
   const hasPattern = post.pattern.trim().length > 0;
   const toc = getToc(post.content);
   const { first, second } = renderArticleWithBreak(post.content);
@@ -224,7 +225,12 @@ export default async function PostPage({ params }: Props) {
         <div className="prose" dangerouslySetInnerHTML={{ __html: first }} />
         {second && (
           <>
-            <AdSlot format="in-article" />
+            <AdSlot
+              format="in-article"
+              client={site.adsEnabled ? site.adsenseClient : ""}
+              slotDisplay={site.adsenseSlotDisplay}
+              slotInArticle={site.adsenseSlotInArticle}
+            />
             <div className="prose" dangerouslySetInnerHTML={{ __html: second }} />
           </>
         )}
@@ -244,7 +250,12 @@ export default async function PostPage({ params }: Props) {
           </a>
         </aside>
 
-        <AdSlot format="display" />
+        <AdSlot
+          format="display"
+          client={site.adsEnabled ? site.adsenseClient : ""}
+          slotDisplay={site.adsenseSlotDisplay}
+          slotInArticle={site.adsenseSlotInArticle}
+        />
 
         {/* 8. FAQ accordion */}
         {post.faq.length > 0 && (

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { categories } from "@/lib/categories";
-import { site } from "@/lib/site";
+import type { Category } from "@/lib/categories";
+import type { SiteSettings } from "@/lib/site";
 
-export default function Footer() {
+export default function Footer({ site, categories }: { site: SiteSettings; categories: Category[] }) {
   return (
     <footer className="site-footer">
       <div className="wrap">

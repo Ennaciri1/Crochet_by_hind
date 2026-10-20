@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getCategory } from "@/lib/categories";
+import { getCategories } from "@/lib/categories";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
@@ -19,10 +19,13 @@ type Row = {
 export default async function AdminPostsPage({ searchParams }: { searchParams: Promise<{ deleted?: string }> }) {
   const { deleted } = await searchParams;
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, slug, title, category, status, published_at, updated_at")
-    .order("updated_at", { ascending: false });
+  const [{ data, error }, categories] = await Promise.all([
+    supabase
+      .from("posts")
+      .select("id, slug, title, category, status, published_at, updated_at")
+      .order("updated_at", { ascending: false }),
+    getCategories(),
+  ]);
 
   const posts = (data ?? []) as Row[];
   const now = Date.now();
@@ -80,7 +83,7 @@ export default async function AdminPostsPage({ searchParams }: { searchParams: P
                     {p.title}
                   </Link>
                 </td>
-                <td data-label="Category">{getCategory(p.category)?.name ?? p.category}</td>
+                <td data-label="Category">{categories.find((c) => c.slug === p.category)?.name ?? p.category}</td>
                 <td data-label="Status">
                   {isScheduled(p) ? (
                     <span className="badge badge-scheduled">Scheduled {formatDate(p.published_at)}</span>

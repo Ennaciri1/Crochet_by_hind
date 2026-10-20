@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { categories } from "@/lib/categories";
+import type { Category } from "@/lib/categories";
 import { renderMarkdown, slugify } from "@/lib/markdown";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Post } from "@/lib/types";
@@ -101,7 +101,15 @@ async function uploadImage(file: File): Promise<string> {
 /* Editor                                                              */
 /* ------------------------------------------------------------------ */
 
-export default function PostEditor({ post, saved }: { post?: Post; saved?: string }) {
+export default function PostEditor({
+  post,
+  saved,
+  categories,
+}: {
+  post?: Post;
+  saved?: string;
+  categories: Category[];
+}) {
   const isNew = !post;
   const [state, formAction, pending] = useActionState<FormState, FormData>(savePost, null);
 
