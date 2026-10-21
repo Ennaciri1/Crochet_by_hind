@@ -1062,20 +1062,35 @@ textarea:focus { border-color: var(--accent); }
     justify-content: center;
     align-items: start;
   }
-  .post-aside {
-    position: sticky;
-    top: 1.5rem;
-    /* On a short laptop screen the box scrolls inside itself rather than
-       spilling past the bottom of the viewport. */
-    max-height: calc(100vh - 3rem);
-    overflow-y: auto;
-  }
-  .post-aside .subscribe { margin: 0; padding: 1.25rem; }
-  .post-aside .subscribe h2 { font-size: 1.15rem; }
-  .post-aside .subscribe-text p { font-size: 0.92rem; }
+  /* Everything in this column is tightened so the two cards fit one screen
+     together. A sidebar taller than the viewport has to either scroll inside
+     itself or hide its own bottom, and both look broken. */
+  .post-aside .author-bio { margin-bottom: 1rem; padding: 1.1rem 1rem; }
+  .post-aside .author-bio-mark { width: 64px; height: 64px; margin-bottom: 0.55rem; }
+  .post-aside .author-bio-hi { font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .post-aside .author-bio-text { font-size: 0.86rem; line-height: 1.5; margin-bottom: 0.55rem; }
+  .post-aside .author-bio-link { font-size: 0.85rem; }
+
+  .post-aside .subscribe { margin: 0; padding: 1.1rem 1rem; }
+  .post-aside .subscribe h2 { font-size: 1.05rem; margin-bottom: 0.25rem; }
+  .post-aside .subscribe-text p { font-size: 0.86rem; line-height: 1.5; }
+  .post-aside .subscribe-form { margin-top: 0.8rem; }
+  .post-aside .subscribe-form .field { margin-bottom: 0.6rem; }
+  .post-aside .subscribe-form label { font-size: 0.8rem; margin-bottom: 0.2rem; }
   /* 300px is too narrow for two fields side by side. */
   .post-aside .subscribe-fields { grid-template-columns: 1fr; }
   .post-aside .subscribe-form .btn { width: 100%; min-width: 0; }
+  .post-aside .subscribe-small { margin-top: 0.5rem; font-size: 0.75rem; }
+}
+
+/* Follow the reader only when the screen is tall enough to show the whole
+   column at once. On a short laptop it simply scrolls away with the article,
+   which reads better than a sidebar that scrolls inside itself. */
+@media (min-width: 1180px) and (min-height: 720px) {
+  .post-aside {
+    position: sticky;
+    top: 1.5rem;
+  }
 }
 
 /* ---------- "About me" beside every pattern ---------- */
@@ -1113,9 +1128,11 @@ textarea:focus { border-color: var(--accent); }
 }
 .author-bio-link:hover { text-decoration: underline; }
 
-/* Side by side on a phone, where the box sits at the end of the article and
-   a stacked portrait would waste a lot of height. */
-@media (min-width: 480px) and (max-width: 1179px) {
+/* Side by side on a phone, where the box sits at the end of the article and a
+   stacked portrait would waste a lot of height. Only the narrowest screens keep
+   the stacked version, where a column of text beside the logo would be too thin
+   to read. */
+@media (min-width: 360px) and (max-width: 1179px) {
   .author-bio {
     display: grid;
     grid-template-columns: auto 1fr;
