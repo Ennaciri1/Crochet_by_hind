@@ -62,7 +62,7 @@ Tables (all in [supabase/schema.sql](supabase/schema.sql), safe to re-run): `pos
 `id = 1`), `categories`, `pages`, `admins`, `messages`, `subscribers`, plus a public `images` storage bucket.
 
 The article body is a `.post-layout` grid: one column everywhere, and from 1180px a second 300px column
-holding a sticky `.post-aside`. The sign-up box is rendered **once** and moves between the two by grid flow —
+holding a sticky `.post-aside` ([AuthorBio](components/AuthorBio.tsx) then the sign-up box). The sign-up box is rendered **once** and moves between the two by grid flow —
 sticky beside the article on a wide screen, last thing in the article on a narrow one. Don't "fix" this by
 rendering it twice and hiding one: that duplicates the form's `id` attributes and breaks the labels. The
 breakpoint is 1180px because 760 (`--read`) + 40 gap + 300 fits inside `--wrap` minus the gutters; narrowing
@@ -76,6 +76,12 @@ slow or broken Brevo must not turn a successful sign-up into an error. Failures 
 because accounts differ (`FIRSTNAME` vs `FNAME`, override with `BREVO_NAME_ATTRIBUTE`). A duplicate-email
 sign-up is still pushed to Brevo, so addresses captured before Brevo was connected get there eventually.
 `BREVO_API_KEY` is server-only and must never gain a `NEXT_PUBLIC_` prefix.
+
+`settings.author_bio` holds the short "about me" beside each pattern. It ships as
+[supabase/add-author-bio.sql](supabase/add-author-bio.sql) because it was added after the first deploy;
+until that runs, `select("*")` simply returns no such field, the bio falls back to `""` and
+[AuthorBio](components/AuthorBio.tsx) renders nothing. Emptying the field in /admin hides the box — that is
+the intended switch, not a bug.
 
 `subscribers` backs the email box at the bottom of every post
 ([SubscribeForm](components/SubscribeForm.tsx) → [newsletter/actions.ts](app/(site)/newsletter/actions.ts) →

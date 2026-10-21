@@ -71,6 +71,7 @@ create table if not exists public.settings (
   adsense_client          text not null default '',
   adsense_slot_in_article text not null default '',
   adsense_slot_display    text not null default '',
+  author_bio              text not null default '', -- short "about me" beside each pattern
   updated_at              timestamptz not null default now()
 );
 

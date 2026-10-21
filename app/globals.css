@@ -1078,6 +1078,57 @@ textarea:focus { border-color: var(--accent); }
   .post-aside .subscribe-form .btn { width: 100%; min-width: 0; }
 }
 
+/* ---------- "About me" beside every pattern ---------- */
+.author-bio {
+  margin: 0 0 1.25rem;
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.author-bio-mark {
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 0.75rem;
+  border-radius: 50%;
+}
+.author-bio-hi {
+  font-family: var(--font-head);
+  font-size: 1.02rem;
+  margin: 0 0 0.4rem;
+}
+.author-bio-hi strong { color: var(--accent); }
+.author-bio-text {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0 0 0.8rem;
+}
+.author-bio-link {
+  font-family: var(--font-head);
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.author-bio-link:hover { text-decoration: underline; }
+
+/* Side by side on a phone, where the box sits at the end of the article and
+   a stacked portrait would waste a lot of height. */
+@media (min-width: 480px) and (max-width: 1179px) {
+  .author-bio {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 1.1rem;
+    align-items: center;
+    text-align: left;
+  }
+  .author-bio-mark { grid-row: span 3; margin: 0; }
+  .author-bio-hi,
+  .author-bio-text,
+  .author-bio-link { grid-column: 2; }
+}
+
 /* ---------- Email sign-up (bottom of every post) ---------- */
 .subscribe {
   margin: 2.5rem 0 1rem;

@@ -36,6 +36,14 @@ export default function SettingsForm({ site }: { site: SiteSettings }) {
             <textarea id="description" name="description" rows={3} defaultValue={site.description} />
             <p className="hint">Used in the homepage meta description and social previews.</p>
           </div>
+          <div className="field">
+            <label htmlFor="author_bio">About me</label>
+            <textarea id="author_bio" name="author_bio" rows={4} maxLength={600} defaultValue={site.bio} />
+            <p className="hint">
+              Shown beside every pattern, under your logo. Two or three friendly sentences: who you are, how
+              long you have been crocheting, what readers will find here. Leave empty to hide the box.
+            </p>
+          </div>
         </section>
 
         <section className="panel">

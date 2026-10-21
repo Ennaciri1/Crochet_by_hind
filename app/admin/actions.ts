@@ -375,6 +375,7 @@ export async function saveSettings(_prev: FormState, formData: FormData): Promis
     site_name: text(formData, "site_name", 200),
     author_name: text(formData, "author_name", 200),
     contact_email: text(formData, "contact_email", 200),
+    author_bio: text(formData, "author_bio", 600),
     etsy_url: text(formData, "etsy_url", 500),
     pinterest_url: text(formData, "pinterest_url", 500),
     description: text(formData, "description", 500),

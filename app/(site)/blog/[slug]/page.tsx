@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AdSlot from "@/components/AdSlot";
+import AuthorBio from "@/components/AuthorBio";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CoverImage from "@/components/CoverImage";
 import JsonLd from "@/components/JsonLd";
@@ -282,6 +283,7 @@ export default async function PostPage({ params }: Props) {
         {/* 9. Email sign-up. Sticky beside the article on a wide screen, at the
             end of it on a narrow one — never a floating bar over the pattern. */}
         <aside className="post-aside">
+          <AuthorBio />
           <SubscribeForm source={post.slug} />
         </aside>
       </div>

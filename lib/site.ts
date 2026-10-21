@@ -23,6 +23,7 @@ export type SiteSettings = {
   name: string;
   author: string;
   email: string;
+  bio: string;
   etsy: string;
   pinterest: string;
   description: string;
@@ -36,6 +37,7 @@ const envDefaults: SiteSettings = {
   name: process.env.NEXT_PUBLIC_SITE_NAME || "My Crochet Blog",
   author: process.env.NEXT_PUBLIC_AUTHOR_NAME || "The Designer",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@example.com",
+  bio: "",
   etsy: process.env.NEXT_PUBLIC_ETSY_SHOP_URL || "https://www.etsy.com",
   pinterest: process.env.NEXT_PUBLIC_PINTEREST_URL || "https://www.pinterest.com",
   description:
@@ -58,6 +60,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
     name: data.site_name || envDefaults.name,
     author: data.author_name || envDefaults.author,
     email: data.contact_email || envDefaults.email,
+    bio: data.author_bio || envDefaults.bio,
     etsy: data.etsy_url || envDefaults.etsy,
     pinterest: data.pinterest_url || envDefaults.pinterest,
     description: data.description || envDefaults.description,
