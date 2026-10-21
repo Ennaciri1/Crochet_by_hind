@@ -5,6 +5,7 @@ import AdSlot from "@/components/AdSlot";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CoverImage from "@/components/CoverImage";
 import JsonLd from "@/components/JsonLd";
+import Lightbox from "@/components/Lightbox";
 import PatternCard from "@/components/PatternCard";
 import { PostGrid } from "@/components/PostCard";
 import YarnBall from "@/components/YarnBall";
@@ -166,13 +167,13 @@ export default async function PostPage({ params }: Props) {
         </p>
       </header>
 
-      {/* 2. Large vertical cover photo */}
+      {/* 2. Cover photo. Capped in CSS so it never fills a whole phone screen. */}
       {post.cover_url && (
         <div className="post-cover">
           <CoverImage
             src={post.cover_url}
             alt={post.cover_alt || post.title}
-            sizes="(max-width: 700px) 100vw, 640px"
+            sizes="(max-width: 760px) 100vw, 520px"
             priority
           />
         </div>
@@ -197,11 +198,11 @@ export default async function PostPage({ params }: Props) {
       </div>
 
       <div className="read">
-        {/* 4. Table of contents */}
+        {/* 4. Compact table of contents: wrapping links, not a tall boxed list */}
         {toc.length > 1 && (
           <nav className="toc" aria-labelledby="toc-title">
             <h2 id="toc-title">In this post</h2>
-            <ol>
+            <ul>
               {toc.map((item) => (
                 <li key={item.id}>
                   <a href={`#${item.id}`}>{item.text}</a>
@@ -217,7 +218,7 @@ export default async function PostPage({ params }: Props) {
                   <a href="#faq">FAQ</a>
                 </li>
               )}
-            </ol>
+            </ul>
           </nav>
         )}
 
@@ -281,6 +282,9 @@ export default async function PostPage({ params }: Props) {
           <PostGrid posts={related} />
         </section>
       )}
+
+      {/* Tap any step photo to see it full size. */}
+      <Lightbox />
     </article>
   );
 }

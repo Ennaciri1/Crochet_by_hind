@@ -7,7 +7,8 @@ import JsonLd from "@/components/JsonLd";
 import { PostGrid } from "@/components/PostCard";
 import YarnBall from "@/components/YarnBall";
 import { getCategories, getCategory, yarnVars } from "@/lib/categories";
-import { getLatestPosts } from "@/lib/posts";
+import { QUALITY_COVER } from "@/lib/images";
+import { getPostsPage, POSTS_PER_PAGE } from "@/lib/posts";
 import { absoluteUrl, getSiteSettings } from "@/lib/site";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
@@ -21,7 +22,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [posts, categories, site] = await Promise.all([getLatestPosts(13), getCategories(), getSiteSettings()]);
+  // One extra post: the newest is featured in the hero, the rest fill the grid.
+  const [{ posts }, categories, site] = await Promise.all([
+    getPostsPage({ page: 1, perPage: POSTS_PER_PAGE + 1 }),
+    getCategories(),
+    getSiteSettings(),
+  ]);
   const [newest, ...rest] = posts;
   const newestCategory = newest ? await getCategory(newest.category) : undefined;
 
@@ -50,8 +56,8 @@ export default async function HomePage() {
               Happy little things to make with <span className="hl">cotton yarn</span> and a hook.
             </h1>
             <p className="hero-lede">
-              Clear, tested patterns for beginners and seasoned makers: amigurumi friends, cozy wearables and colorful
-              pieces for your home. Every pattern is free to read here.
+              Clear, tested patterns for beginners and seasoned makers: amigurumi friends, cozy wearables and
+              colorful pieces for your home. Every pattern is free to read here.
             </p>
             <div className="hero-actions">
               <Link className="btn btn-primary" href="/category/free-patterns">
@@ -65,10 +71,10 @@ export default async function HomePage() {
 
           <div className="hero-art">
             {/* Decorative yarn balls around the newest post */}
-            <YarnBall className="deco deco-1" color="var(--yarn-rose)" size={110} />
-            <YarnBall className="deco deco-2" color="var(--yarn-mint)" size={80} />
-            <YarnBall className="deco deco-3" color="var(--yarn-butter)" size={64} tail={false} />
-            <YarnBall className="deco deco-4" color="var(--yarn-lilac)" size={72} />
+            <YarnBall className="deco deco-1" color="var(--yarn-rose)" size={96} />
+            <YarnBall className="deco deco-2" color="var(--yarn-butter)" size={74} />
+            <YarnBall className="deco deco-3" color="var(--yarn-mint)" size={58} tail={false} />
+            <YarnBall className="deco deco-4" color="var(--yarn-sky)" size={66} />
 
             {newest ? (
               <Link href={`/blog/${newest.slug}`} className="hero-feature" style={yarnVars(newestCategory?.color)}>
@@ -76,7 +82,9 @@ export default async function HomePage() {
                   <CoverImage
                     src={newest.cover_url}
                     alt={newest.cover_alt || newest.title}
-                    sizes="(max-width: 860px) 90vw, 460px"
+                    /* The card is never wider than 340px, so neither is the file. */
+                    sizes="(max-width: 879px) 320px, 340px"
+                    quality={QUALITY_COVER}
                     priority
                   />
                 </div>
@@ -87,22 +95,13 @@ export default async function HomePage() {
               </Link>
             ) : (
               <div className="hero-feature hero-empty">
-                <YarnBall color="var(--yarn-sky)" size={160} />
+                <YarnBall color="var(--yarn-rose)" size={150} />
               </div>
             )}
           </div>
         </section>
 
         <CategoryTiles categories={categories} />
-
-        <hr className="stitch" />
-
-        <AdSlot
-          format="display"
-          client={site.adsEnabled ? site.adsenseClient : ""}
-          slotDisplay={site.adsenseSlotDisplay}
-          slotInArticle={site.adsenseSlotInArticle}
-        />
 
         <div className="section-head">
           <h2>Latest patterns</h2>
@@ -116,6 +115,13 @@ export default async function HomePage() {
             {newest ? "More patterns are on the hook. Come back soon!" : "No posts yet. Write your first one in /admin."}
           </p>
         )}
+
+        <AdSlot
+          format="display"
+          client={site.adsEnabled ? site.adsenseClient : ""}
+          slotDisplay={site.adsenseSlotDisplay}
+          slotInArticle={site.adsenseSlotInArticle}
+        />
       </div>
     </>
   );

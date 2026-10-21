@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import type { Category } from "@/lib/categories";
+import { parseImageMeta, withImageMeta } from "@/lib/images";
 import { slugify } from "@/lib/markdown";
 import {
   applyPhotoTokens,
@@ -841,9 +842,12 @@ async function runWithLimit<T>(items: T[], limit: number, worker: (item: T) => P
 
 /** ".../object/public/images/posts/slug/123-photo.jpg" → "posts/slug/123-photo.jpg" */
 function storagePath(url: string) {
+  // parseImageMeta drops the "#w=...&h=..." size hint, which is part of the
+  // Markdown link but not part of the file's path in the bucket.
+  const { src } = parseImageMeta(url);
   const marker = "/images/";
-  const at = url.indexOf(marker);
-  return at >= 0 ? url.slice(at + marker.length) : url;
+  const at = src.indexOf(marker);
+  return at >= 0 ? src.slice(at + marker.length) : src;
 }
 
 function message(err: unknown) {
@@ -1118,7 +1122,15 @@ export default function ImportForm({ categories }: { categories: Category[] }) {
 
       for (const row of toImport) {
         const bodyPhotos = row.bodyPhotos
-          .map((photo, i) => ({ url: uploadedRef.current.get(photo.id), alt: row.bodyAlts[i] ?? "" }))
+          .map((photo, i) => {
+            const url = uploadedRef.current.get(photo.id);
+            // The pixel size travels with the Markdown link so the reader's
+            // browser can reserve the right space (see lib/images.ts). Covers
+            // get no hint: they go through <Image>, which measures them itself.
+            const sized =
+              url && photo.w && photo.h ? withImageMeta(url, { w: photo.w, h: photo.h }) : url;
+            return { url: sized, alt: row.bodyAlts[i] ?? "" };
+          })
           .filter((item): item is { url: string; alt: string } => Boolean(item.url));
         const { content } = applyPhotoTokens(row.row.content ?? "", bodyPhotos);
         const coverUrl =

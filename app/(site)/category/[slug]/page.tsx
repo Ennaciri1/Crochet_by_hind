@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import AdSlot from "@/components/AdSlot";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { CategoryPills } from "@/components/CategoryNav";
-import { PostGrid } from "@/components/PostCard";
-import YarnBall from "@/components/YarnBall";
-import { getCategories, getCategory, yarnVars } from "@/lib/categories";
-import { getPostsByCategory } from "@/lib/posts";
-import { getSiteSettings } from "@/lib/site";
+import { getCategories } from "@/lib/categories";
+import CategoryListing, { categoryMetadata } from "./listing";
 
 export const revalidate = 300;
 
@@ -20,58 +13,10 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategory(slug);
-  if (!category) return {};
-  const title = slug === "free-patterns" ? "Free Crochet Patterns" : `${category.name} Crochet Patterns`;
-  return {
-    title,
-    description: category.description,
-    alternates: { canonical: `/category/${slug}` },
-    openGraph: { url: `/category/${slug}`, title, description: category.description },
-  };
+  return categoryMetadata(slug, 1);
 }
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const [category, categories, site] = await Promise.all([getCategory(slug), getCategories(), getSiteSettings()]);
-  if (!category) notFound();
-
-  const posts = await getPostsByCategory(slug);
-
-  return (
-    <div className="wrap">
-      <header className="page-head category-head" style={yarnVars(category.color)}>
-        <Breadcrumbs items={[{ name: category.name, href: `/category/${slug}` }]} />
-        <div className="category-head-row">
-          <div>
-            <h1>{category.name}</h1>
-            <p>{category.description}</p>
-          </div>
-          <YarnBall color="var(--c)" size={120} className="category-head-ball" />
-        </div>
-        <CategoryPills categories={categories} current={slug} />
-      </header>
-
-      <hr className="stitch" />
-
-      {posts.length > 0 ? (
-        <>
-          <PostGrid posts={posts.slice(0, 6)} />
-          {posts.length > 6 && (
-            <>
-              <AdSlot
-                format="display"
-                client={site.adsEnabled ? site.adsenseClient : ""}
-                slotDisplay={site.adsenseSlotDisplay}
-                slotInArticle={site.adsenseSlotInArticle}
-              />
-              <PostGrid posts={posts.slice(6)} />
-            </>
-          )}
-        </>
-      ) : (
-        <p className="empty">No patterns in this category yet. Come back soon!</p>
-      )}
-    </div>
-  );
+  return <CategoryListing slug={slug} page={1} />;
 }

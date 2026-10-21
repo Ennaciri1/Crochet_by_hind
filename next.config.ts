@@ -1,22 +1,23 @@
 import type { NextConfig } from "next";
-
-// Allow next/image to optimize photos stored in your Supabase Storage bucket.
-const supabaseHost = (() => {
-  try {
-    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname;
-  } catch {
-    return "*.supabase.co";
-  }
-})();
+import { supabaseImageHost } from "./lib/images";
 
 const nextConfig: NextConfig = {
   // The bulk importer posts batches of rows; a long pattern easily passes the 1 MB default.
   experimental: { serverActions: { bodySizeLimit: "8mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
+    // 75 for photos, 85 for cover images. Any other value is coerced by Next,
+    // so keep this in step with lib/images.ts.
     qualities: [75, 85],
+    // Post photos are immutable (the upload path carries a timestamp), so an
+    // optimized copy can be cached for a year instead of being rebuilt.
+    minimumCacheTTL: 31536000,
     remotePatterns: [
-      { protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" },
+      {
+        protocol: "https",
+        hostname: supabaseImageHost(),
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };

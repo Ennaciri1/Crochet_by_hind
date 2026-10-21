@@ -2,9 +2,10 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { Category } from "@/lib/categories";
+import { withImageMeta } from "@/lib/images";
 import { renderMarkdown, slugify } from "@/lib/markdown";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Post } from "@/lib/types";
+import { readImageSize, uploadImage } from "@/lib/upload";
 import { faqToText } from "@/lib/utils";
 import { deletePost, savePost, type FormState } from "../../actions";
 
@@ -68,33 +69,12 @@ Q: Can I sell items made from this pattern?
 A: Yes, you may sell finished items you made yourself. Please credit this site.`,
 };
 
-const BUCKET = "images";
-
 /** "2026-10-18T09:30:00Z" → "2026-10-18T11:30" in the browser's time zone (for datetime-local). */
 function toLocalInput(iso: string | null | undefined) {
   if (!iso) return "";
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-/** Uploads a file to Supabase Storage and returns its public URL. */
-async function uploadImage(file: File): Promise<string> {
-  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
-  if (file.size > 10 * 1024 * 1024) throw new Error("This image is larger than 10 MB. Please resize it first.");
-
-  const supabase = createSupabaseBrowserClient();
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-  const base = slugify(file.name.replace(/\.[^.]+$/, "")) || "photo";
-  const path = `posts/${new Date().getFullYear()}/${Date.now()}-${base}.${ext}`;
-
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-    cacheControl: "31536000",
-    contentType: file.type,
-    upsert: false,
-  });
-  if (error) throw new Error(`Upload failed: ${error.message}`);
-  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
 /* ------------------------------------------------------------------ */
@@ -165,9 +145,11 @@ export default function PostEditor({
     try {
       const snippets: string[] = [];
       for (const file of Array.from(files)) {
-        const url = await uploadImage(file);
+        // The pixel size is recorded in the Markdown link so the reader's
+        // browser can reserve the right space before the photo arrives.
+        const [url, size] = await Promise.all([uploadImage(file, { slug }), readImageSize(file)]);
         const alt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
-        snippets.push(`![${alt}](${url})`);
+        snippets.push(`![${alt}](${withImageMeta(url, size)})`);
       }
       setTab("write");
       insertAtCursor(`\n\n${snippets.join("\n\n")}\n\n`);
@@ -185,7 +167,9 @@ export default function PostEditor({
     setUploadError("");
     setUploading("cover");
     try {
-      setCoverUrl(await uploadImage(file));
+      // No size hint here: the cover goes through <Image>, which builds its own
+      // srcset, and a "#w=..." fragment would end up inside the optimizer URL.
+      setCoverUrl(await uploadImage(file, { slug }));
     } catch (e) {
       setUploadError((e as Error).message);
     } finally {

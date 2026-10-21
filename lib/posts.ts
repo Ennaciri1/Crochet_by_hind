@@ -39,6 +39,65 @@ export async function getPostsByCategory(category: string, limit = 48): Promise<
   return (data as unknown as PostSummary[]) ?? [];
 }
 
+/** How many cards one listing page shows. A multiple of 6 fills 1, 2 and 3 columns evenly. */
+export const POSTS_PER_PAGE = 12;
+
+export type PostsPage = {
+  posts: PostSummary[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
+/**
+ * One page of a listing, newest first. Used by the homepage, the category pages
+ * and search so a blog with 200 patterns never renders 200 cards at once.
+ * `page` is 1-based; out-of-range pages come back empty with the real count, so
+ * the caller can send a 404.
+ */
+export async function getPostsPage({
+  category,
+  page = 1,
+  perPage = POSTS_PER_PAGE,
+}: {
+  category?: string;
+  page?: number;
+  perPage?: number;
+} = {}): Promise<PostsPage> {
+  const empty = { posts: [], total: 0, page: 1, totalPages: 0 };
+
+  const supabase = getPublicClient();
+  if (!supabase) return empty;
+
+  let query = supabase
+    .from("posts")
+    .select(SUMMARY_FIELDS, { count: "exact" })
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString());
+
+  if (category) query = query.eq("category", category);
+
+  const current = Math.max(1, Math.floor(page) || 1);
+  const from = (current - 1) * perPage;
+
+  const { data, count, error } = await query
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+
+  if (error) {
+    console.error("getPostsPage:", error.message);
+    return empty;
+  }
+
+  const total = count ?? 0;
+  return {
+    posts: (data as unknown as PostSummary[]) ?? [],
+    total,
+    page: current,
+    totalPages: Math.max(1, Math.ceil(total / perPage)),
+  };
+}
+
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const query = publishedQuery("*");
   if (!query) return null;

@@ -1,9 +1,18 @@
 import { Marked, type Tokens, type TokensList } from "marked";
+import {
+  ARTICLE_IMAGE_SIZES,
+  buildSrcSet,
+  fallbackWidth,
+  isOptimizable,
+  optimizedUrl,
+  parseImageMeta,
+} from "./images";
 
 /**
  * Markdown → HTML for articles.
  * - "## Heading" gets an id so the table of contents can link to it.
- * - Images are lazy-loaded.
+ * - Images go through the Next image optimizer (AVIF/WebP + srcset) and are
+ *   lazy-loaded, so a step photo costs ~20 KB on a phone instead of 3 MB.
  * - Scripts, inline event handlers and javascript: links are removed.
  */
 
@@ -47,8 +56,52 @@ function createMarked() {
         return `<h${level}${id}>${text}</h${level}>\n`;
       },
       image(token: Tokens.Image) {
-        const title = token.title ? ` title="${escapeAttr(token.title)}"` : "";
-        return `<img src="${escapeAttr(token.href)}" alt="${escapeAttr(token.text)}"${title} loading="lazy" decoding="async" />`;
+        const { src, width, height } = parseImageMeta(token.href);
+        const alt = escapeAttr(token.text);
+        const caption = token.title
+          ? `<figcaption>${escapeAttr(token.title)}</figcaption>`
+          : "";
+
+        // An image the optimizer cannot serve (SVG, foreign host) is left alone
+        // rather than turned into a request that would 400.
+        if (!isOptimizable(src)) {
+          return `<figure class="figure"><img src="${escapeAttr(src)}" alt="${alt}" loading="lazy" decoding="async" />${caption}</figure>`;
+        }
+
+        // width/height let the browser reserve the right box before the photo
+        // arrives, which is what keeps CLS at 0. They are only known for photos
+        // uploaded since the size hint was added (see lib/images.ts).
+        const dimensions = width && height ? ` width="${width}" height="${height}"` : "";
+        const display = optimizedUrl(src, fallbackWidth(width));
+
+        // The <button> makes "view larger" reachable by keyboard and announced
+        // by screen readers without any JavaScript in the markup itself.
+        return (
+          `<figure class="figure">` +
+          `<button type="button" class="zoom-btn" aria-label="View larger photo">` +
+          `<img src="${escapeAttr(display)}"` +
+          ` srcset="${escapeAttr(buildSrcSet(src, width))}"` +
+          ` sizes="${ARTICLE_IMAGE_SIZES}"` +
+          ` alt="${alt}"${dimensions}` +
+          ` loading="lazy" decoding="async"` +
+          ` data-zoom="${escapeAttr(optimizedUrl(src, 1200))}" />` +
+          `</button>${caption}</figure>`
+        );
+      },
+
+      /**
+       * A <figure> is not allowed inside a <p>, and the browser would hoist it
+       * out and leave an empty paragraph behind. A paragraph that holds nothing
+       * but photos therefore skips the <p> wrapper.
+       */
+      paragraph(this: { parser: { parseInline: (t: Tokens.Generic[]) => string } }, token: Tokens.Paragraph) {
+        const inner = this.parser.parseInline(token.tokens);
+        const onlyImages =
+          token.tokens.length > 0 &&
+          token.tokens.every(
+            (t) => t.type === "image" || t.type === "space" || (t.type === "text" && !t.raw.trim()),
+          );
+        return onlyImages ? `${inner}\n` : `<p>${inner}</p>\n`;
       },
       link(this: { parser: { parseInline: (t: Tokens.Generic[]) => string } }, token: Tokens.Link) {
         const text = this.parser.parseInline(token.tokens);
@@ -84,8 +137,13 @@ export function getToc(markdown: string): TocItem[] {
  */
 export function renderArticleWithBreak(markdown: string): { first: string; second: string } {
   const tokens = marked.lexer(markdown ?? "");
+  // Only paragraphs of prose count: splitting on a paragraph that holds a step
+  // photo would push the ad between a photo and the text explaining it.
+  const isTextParagraph = (token: Tokens.Generic) =>
+    token.type === "paragraph" &&
+    ((token as Tokens.Paragraph).tokens ?? []).some((t) => t.type !== "image" && t.type !== "space");
   const paragraphIndexes = tokens
-    .map((t, i) => (t.type === "paragraph" ? i : -1))
+    .map((t, i) => (isTextParagraph(t) ? i : -1))
     .filter((i) => i >= 0);
 
   if (paragraphIndexes.length < 4) {

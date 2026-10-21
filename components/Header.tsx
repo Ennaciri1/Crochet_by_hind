@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import YarnBall from "./YarnBall";
 import type { Category } from "@/lib/categories";
 
 export default function Header({ siteName, categories }: { siteName: string; categories: Category[] }) {
@@ -10,7 +10,8 @@ export default function Header({ siteName, categories }: { siteName: string; cat
       </a>
       <div className="wrap">
         <Link href="/" className="logo">
-          <YarnBall className="logo-mark" color="var(--yarn-rose)" size={34} />
+          {/* alt="" on purpose: the site name next to it already says this. */}
+          <Image src="/logo.png" alt="" width={48} height={48} className="logo-mark" priority />
           {siteName}
         </Link>
         <nav className="main-nav" aria-label="Main">
