@@ -50,6 +50,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
             <Link href="/admin/posts/new">+ New post</Link>
             <Link href="/admin/import">Import</Link>
             <Link href="/admin/messages">Messages</Link>
+            <Link href="/admin/subscribers">Subscribers</Link>
             <Link href="/admin/settings">Settings</Link>
             <Link href="/admin/categories">Categories</Link>
             <Link href="/admin/pages">Pages</Link>

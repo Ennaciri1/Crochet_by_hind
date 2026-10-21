@@ -156,11 +156,25 @@ create table if not exists public.messages (
 );
 
 -- ---------------------------------------------------------------------
+-- 3b. SUBSCRIBERS  (the email box at the bottom of every post)
+-- ---------------------------------------------------------------------
+create table if not exists public.subscribers (
+  id         uuid primary key default gen_random_uuid(),
+  name       text not null default '',
+  email      text not null unique,
+  source     text not null default '',   -- the post they signed up from
+  created_at timestamptz not null default now()
+);
+
+create index if not exists subscribers_created_idx on public.subscribers (created_at desc);
+
+-- ---------------------------------------------------------------------
 -- 4. ROW LEVEL SECURITY
 -- ---------------------------------------------------------------------
-alter table public.posts      enable row level security;
-alter table public.admins     enable row level security;
-alter table public.messages   enable row level security;
+alter table public.posts       enable row level security;
+alter table public.admins      enable row level security;
+alter table public.messages    enable row level security;
+alter table public.subscribers enable row level security;
 alter table public.settings   enable row level security;
 alter table public.categories enable row level security;
 alter table public.pages      enable row level security;
@@ -282,6 +296,31 @@ create policy "Admins can delete messages"
   to authenticated
   using (public.is_admin());
 
+-- SUBSCRIBERS: anyone can sign up, only admins can read the list.
+-- No select policy for anon, so the email list can never be read from the site.
+drop policy if exists "Anyone can subscribe" on public.subscribers;
+create policy "Anyone can subscribe"
+  on public.subscribers for insert
+  to anon, authenticated
+  with check (
+    char_length(email) between 3 and 200
+    and email like '%_@_%.__%'
+    and char_length(name) <= 100
+    and char_length(source) <= 200
+  );
+
+drop policy if exists "Admins can read subscribers" on public.subscribers;
+create policy "Admins can read subscribers"
+  on public.subscribers for select
+  to authenticated
+  using (public.is_admin());
+
+drop policy if exists "Admins can delete subscribers" on public.subscribers;
+create policy "Admins can delete subscribers"
+  on public.subscribers for delete
+  to authenticated
+  using (public.is_admin());
+
 -- ---------------------------------------------------------------------
 -- 5. STORAGE: public bucket "images"
 -- ---------------------------------------------------------------------
@@ -339,7 +378,8 @@ $md$),
 
 ## Information we collect
 
-- **Contact form:** when you send a message, we store your name, email address and message so we can reply. We never sell this information or add you to a mailing list.
+- **Contact form:** when you send a message, we store your name, email address and message so we can reply. We never sell this information, and we do not add you to the mailing list unless you sign up for it yourself.
+- **Mailing list:** if you sign up through the form at the end of a pattern, we store the first name and email address you give us, together with the post you signed up from, so we can send you new patterns.
 - **Log data:** our hosting provider automatically records technical information such as your IP address, browser type and the pages you visit, for security and performance.
 - **Cookies:** small files stored on your device, mostly by our advertising partner (see below).
 
@@ -360,8 +400,21 @@ If you visit from the European Economic Area, the United Kingdom or Switzerland,
 ## How we use your information
 
 - To answer your messages
+- To send you new patterns, but only if you signed up for them
 - To keep the site secure and working well
 - To show ads that keep the patterns free
+
+## The mailing list
+
+Joining the mailing list is optional: you only hear from us if you fill in the sign-up form yourself. We use your email address to send new patterns, tutorials and the occasional free file — nothing else.
+
+We never sell, rent or share your email address. The list is managed with [Brevo](https://www.brevo.com), a company based in the European Union, which stores it on our behalf. Any email we send you will include an unsubscribe link, and you can ask us to remove you at any time through the [contact page](/contact). Once you unsubscribe, we delete your address from the list.
+
+## Where your information is stored
+
+This website is hosted by **Vercel**, and everything described above — contact messages, mailing-list addresses and the photos on the site — is stored in a **Supabase** database. If you join the mailing list, your first name and email address are also stored with **Brevo**, the service we use to send those emails. All three companies process this data only on our instructions, as service providers, and are not allowed to use it for their own purposes.
+
+Their servers may be located outside your own country, including in the United States, so your information may be transferred to and processed there.
 
 ## Data retention and your rights
 

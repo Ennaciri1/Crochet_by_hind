@@ -36,7 +36,8 @@ I love seeing what you make! Share your finished projects on [Pinterest](https:/
 
 ## Information we collect
 
-- **Contact form:** when you send a message, we store your name, email address and message so we can reply. We never sell this information or add you to a mailing list.
+- **Contact form:** when you send a message, we store your name, email address and message so we can reply. We never sell this information, and we do not add you to the mailing list unless you sign up for it yourself.
+- **Mailing list:** if you sign up through the form at the end of a pattern, we store the first name and email address you give us, together with the post you signed up from, so we can send you new patterns.
 - **Log data:** our hosting provider automatically records technical information such as your IP address, browser type and the pages you visit, for security and performance.
 - **Cookies:** small files stored on your device, mostly by our advertising partner (see below).
 
@@ -57,8 +58,21 @@ If you visit from the European Economic Area, the United Kingdom or Switzerland,
 ## How we use your information
 
 - To answer your messages
+- To send you new patterns, but only if you signed up for them
 - To keep the site secure and working well
 - To show ads that keep the patterns free
+
+## The mailing list
+
+Joining the mailing list is optional: you only hear from us if you fill in the sign-up form yourself. We use your email address to send new patterns, tutorials and the occasional free file — nothing else.
+
+We never sell, rent or share your email address. The list is managed with [Brevo](https://www.brevo.com), a company based in the European Union, which stores it on our behalf. Any email we send you will include an unsubscribe link, and you can ask us to remove you at any time through the [contact page](/contact). Once you unsubscribe, we delete your address from the list.
+
+## Where your information is stored
+
+This website is hosted by **Vercel**, and everything described above — contact messages, mailing-list addresses and the photos on the site — is stored in a **Supabase** database. If you join the mailing list, your first name and email address are also stored with **Brevo**, the service we use to send those emails. All three companies process this data only on our instructions, as service providers, and are not allowed to use it for their own purposes.
+
+Their servers may be located outside your own country, including in the United States, so your information may be transferred to and processed there.
 
 ## Data retention and your rights
 

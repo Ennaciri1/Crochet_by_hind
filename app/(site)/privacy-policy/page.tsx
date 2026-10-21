@@ -4,6 +4,9 @@ import { renderMarkdown } from "@/lib/markdown";
 import { getStaticPage } from "@/lib/pages";
 import { getSiteSettings } from "@/lib/site";
 
+// ISR, like the rest of the site: an edit made in /admin shows up within 5 minutes.
+export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
   return {

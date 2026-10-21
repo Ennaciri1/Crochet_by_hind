@@ -354,6 +354,17 @@ export async function deleteMessage(formData: FormData) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Subscribers (the email box at the bottom of every post)             */
+/* ------------------------------------------------------------------ */
+
+export async function deleteSubscriber(formData: FormData) {
+  const supabase = await requireAdmin();
+  const id = text(formData, "id", 64);
+  if (id) await supabase.from("subscribers").delete().eq("id", id);
+  revalidatePath("/admin/subscribers");
+}
+
+/* ------------------------------------------------------------------ */
 /* Settings                                                            */
 /* ------------------------------------------------------------------ */
 

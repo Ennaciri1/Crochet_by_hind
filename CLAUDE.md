@@ -59,7 +59,32 @@ in the admin silently hides drafts.
 ## Data and where content lives
 
 Tables (all in [supabase/schema.sql](supabase/schema.sql), safe to re-run): `posts`, `settings` (single row,
-`id = 1`), `categories`, `pages`, `admins`, `messages`, plus a public `images` storage bucket.
+`id = 1`), `categories`, `pages`, `admins`, `messages`, `subscribers`, plus a public `images` storage bucket.
+
+The article body is a `.post-layout` grid: one column everywhere, and from 1180px a second 300px column
+holding a sticky `.post-aside`. The sign-up box is rendered **once** and moves between the two by grid flow —
+sticky beside the article on a wide screen, last thing in the article on a narrow one. Don't "fix" this by
+rendering it twice and hiding one: that duplicates the form's `id` attributes and breaks the labels. The
+breakpoint is 1180px because 760 (`--read`) + 40 gap + 300 fits inside `--wrap` minus the gutters; narrowing
+the reading column to fit a sidebar earlier would undo the reading-width work.
+
+[lib/brevo.ts](lib/brevo.ts) pushes each new address to Brevo after Supabase has stored it. Two properties
+are deliberate and worth keeping: it is **optional** (no `BREVO_API_KEY` → the site behaves exactly as before,
+everything still lands in Supabase) and it **never throws or blocks** — the reader has already subscribed, so a
+slow or broken Brevo must not turn a successful sign-up into an error. Failures are logged and recoverable from
+`/admin/subscribers` → Download CSV. It retries without `attributes` if Brevo rejects the first-name attribute,
+because accounts differ (`FIRSTNAME` vs `FNAME`, override with `BREVO_NAME_ATTRIBUTE`). A duplicate-email
+sign-up is still pushed to Brevo, so addresses captured before Brevo was connected get there eventually.
+`BREVO_API_KEY` is server-only and must never gain a `NEXT_PUBLIC_` prefix.
+
+`subscribers` backs the email box at the bottom of every post
+([SubscribeForm](components/SubscribeForm.tsx) → [newsletter/actions.ts](app/(site)/newsletter/actions.ts) →
+`/admin/subscribers`). Its RLS deliberately gives anon **insert only and no select**, so the mailing list can
+never be read back from the public site. `email` is unique and the action turns the resulting `23505` into a
+friendly "you are already on the list" rather than an error. `source` records the post someone signed up from.
+Because it was added after the first deploy, it also ships as a standalone
+[supabase/add-subscribers.sql](supabase/add-subscribers.sql); until that is run, the API answers `PGRST205`
+and both the form and the admin page say so in plain language instead of crashing.
 
 `Post` shape is [lib/types.ts](lib/types.ts). Read queries for the public site are [lib/posts.ts](lib/posts.ts)
 (every function returns an empty result rather than throwing). Settings, categories and static pages are each

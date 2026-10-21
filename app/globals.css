@@ -1046,6 +1046,84 @@ textarea:focus { border-color: var(--accent); }
 .etsy-box h2 { font-size: clamp(1.15rem, 3vw, 1.3rem); margin: 0 0 0.3rem; }
 .etsy-box p { margin: 0; color: var(--ink-soft); font-size: 0.98rem; }
 
+/* ---------- Article layout: content + optional sticky sidebar ---------- */
+/* One column everywhere by default, so on a phone the sign-up box is simply
+   the last thing in the article. The second column only appears when there is
+   genuinely room for it beside a 760px reading measure (760 + 40 + 300 = 1100,
+   inside 1180 minus the gutters), so the article itself never gets narrower. */
+.post-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1180px) {
+  .post-layout {
+    grid-template-columns: minmax(0, var(--read)) 300px;
+    gap: 2.5rem;
+    justify-content: center;
+    align-items: start;
+  }
+  .post-aside {
+    position: sticky;
+    top: 1.5rem;
+    /* On a short laptop screen the box scrolls inside itself rather than
+       spilling past the bottom of the viewport. */
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+  .post-aside .subscribe { margin: 0; padding: 1.25rem; }
+  .post-aside .subscribe h2 { font-size: 1.15rem; }
+  .post-aside .subscribe-text p { font-size: 0.92rem; }
+  /* 300px is too narrow for two fields side by side. */
+  .post-aside .subscribe-fields { grid-template-columns: 1fr; }
+  .post-aside .subscribe-form .btn { width: 100%; min-width: 0; }
+}
+
+/* ---------- Email sign-up (bottom of every post) ---------- */
+.subscribe {
+  margin: 2.5rem 0 1rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border-radius: var(--radius);
+  background: var(--tint-butter);
+  border: 1px solid var(--yarn-butter);
+}
+.subscribe-text { max-width: 36em; }
+.subscribe h2 {
+  font-size: clamp(1.2rem, 3.2vw, 1.5rem);
+  margin: 0 0 0.35rem;
+}
+.subscribe-text p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(0.95rem, 2.4vw, 1.02rem);
+}
+.subscribe-form { margin-top: 1.1rem; }
+/* One column on a phone, two side by side as soon as there is room. */
+.subscribe-fields {
+  display: grid;
+  gap: 0 0.8rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 560px) {
+  .subscribe-fields { grid-template-columns: 1fr 1.3fr; }
+}
+.subscribe-form .field { margin-bottom: 0.8rem; }
+.subscribe-form label {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.subscribe-form input { background: var(--surface); }
+.subscribe-form .btn { width: 100%; }
+@media (min-width: 560px) {
+  .subscribe-form .btn { width: auto; min-width: 13rem; }
+}
+.subscribe-small {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.subscribe-done { margin: 1.1rem 0 0; }
+
 /* ---------- FAQ accordion ---------- */
 .faq details {
   border-bottom: 1px solid var(--line);
@@ -1220,6 +1298,7 @@ textarea:focus { border-color: var(--accent); }
   .post-actions,
   .toc,
   .etsy-box,
+  .subscribe,
   .related,
   .pagination,
   .breadcrumbs { display: none !important; }

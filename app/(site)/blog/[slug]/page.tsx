@@ -8,6 +8,7 @@ import JsonLd from "@/components/JsonLd";
 import Lightbox from "@/components/Lightbox";
 import PatternCard from "@/components/PatternCard";
 import { PostGrid } from "@/components/PostCard";
+import SubscribeForm from "@/components/SubscribeForm";
 import YarnBall from "@/components/YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
 import { getToc, markdownToText, readingTime, renderArticleWithBreak } from "@/lib/markdown";
@@ -197,7 +198,11 @@ export default async function PostPage({ params }: Props) {
         </a>
       </div>
 
-      <div className="read">
+      {/* On a wide screen this becomes two columns: the article and a sticky
+          sign-up box. Below 1180px it collapses back to one column and the box
+          simply lands at the end of the article — same element, no duplicate. */}
+      <div className="post-layout">
+        <div className="read">
         {/* 4. Compact table of contents: wrapping links, not a tall boxed list */}
         {toc.length > 1 && (
           <nav className="toc" aria-labelledby="toc-title">
@@ -272,9 +277,16 @@ export default async function PostPage({ params }: Props) {
             ))}
           </section>
         )}
+        </div>
+
+        {/* 9. Email sign-up. Sticky beside the article on a wide screen, at the
+            end of it on a narrow one — never a floating bar over the pattern. */}
+        <aside className="post-aside">
+          <SubscribeForm source={post.slug} />
+        </aside>
       </div>
 
-      {/* 9. Related posts */}
+      {/* 10. Related posts */}
       {related.length > 0 && (
         <section className="related" aria-labelledby="related-title">
           <hr className="stitch" />
