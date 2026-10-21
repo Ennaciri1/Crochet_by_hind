@@ -11,3 +11,10 @@ next-env.d.ts
 
 # Local import files (photos + posts.json for scripts/import-to-supabase.mjs)
 /import/
+
+# Fichiers de recherche (non liés au code)
+*.xlsx
+
+# Photos sources (lourdes, non déployées)
+source-photos/
+patterns/
