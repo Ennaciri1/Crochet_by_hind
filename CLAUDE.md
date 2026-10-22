@@ -109,6 +109,12 @@ calls `revalidatePath("/", "layout")` **plus** `/sitemap.xml` and `/robots.txt` 
 outside the layout tree and would otherwise keep serving an unpublished post. New metadata routes need adding
 there.
 
+`app/sitemap.ts` is `force-dynamic`, not ISR. With `revalidate` it came back from the CDN as a plain
+`x-vercel-cache: HIT` with none of the `x-nextjs-prerender` / `x-nextjs-stale-time` headers the page routes
+carry, so it never regenerated — observed frozen for seven hours with new posts missing. A sitemap costs one
+indexed query and crawlers fetch it rarely, so correctness beats caching here. This also covers posts added by
+`npm run import:posts`, which runs outside the app and so cannot call `revalidatePath` at all.
+
 `SITE_URL` resolution order ([lib/site.ts](lib/site.ts)): `NEXT_PUBLIC_SITE_URL` → Vercel's
 `VERCEL_PROJECT_PRODUCTION_URL` → localhost. It is build-time only, deliberately not a DB setting.
 

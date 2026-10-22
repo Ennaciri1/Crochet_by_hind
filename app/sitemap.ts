@@ -3,7 +3,17 @@ import { getCategories } from "@/lib/categories";
 import { getAllPublishedSlugs } from "@/lib/posts";
 import { absoluteUrl } from "@/lib/site";
 
-export const revalidate = 300;
+/**
+ * Built on every request instead of cached.
+ *
+ * With `revalidate` this route was served straight from the CDN with no
+ * Next.js revalidation headers, so a sitemap generated at deploy time stayed
+ * frozen for hours and new posts never appeared in it. A sitemap is one
+ * indexed query and is fetched by crawlers a handful of times a day, so the
+ * cost of always being correct is negligible — and a stale sitemap is the one
+ * thing that stops Google finding new patterns.
+ */
+export const dynamic = "force-dynamic";
 
 /** /sitemap.xml — home, categories, every published post and the legal pages. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
