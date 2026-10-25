@@ -24,6 +24,7 @@ Technologies : Next.js 16 (App Router), Supabase (base de données, connexion, p
 6. [Google AdSense](#6-google-adsense)
 7. [Écrire un bon article (checklist)](#7-écrire-un-bon-article-checklist)
 8. [Où modifier quoi ?](#8-où-modifier-quoi-)
+9. [Combien de visiteurs ?](#9-combien-de-visiteurs-)
 
 ---
 
@@ -270,5 +271,28 @@ supabase/          schema.sql et seed.sql
 
 Les pages publiques sont mises en cache et reconstruites toutes les 5 minutes au maximum, et immédiatement
 après chaque enregistrement dans l'admin.
+
+---
+
+## 9. Combien de visiteurs ?
+
+Le site compte les visites avec **Vercel Web Analytics** : sans cookie (donc pas de bannière de
+consentement en plus), et seulement sur les pages publiques (vos visites dans `/admin` ne sont pas comptées).
+
+**À faire une seule fois :** Vercel → votre projet → onglet **Analytics** → **Enable**.
+Les chiffres apparaissent après le prochain déploiement et les premières visites (quelques minutes).
+
+**Pour regarder :** dans l'admin, cliquez **Visitors ↗** (ou Vercel → projet → **Analytics**). Vous y voyez :
+
+- **Visitors** : le nombre de personnes différentes, et **Page Views** : le nombre de pages vues ;
+- **Pages** : vos patrons les plus lus ;
+- **Referrers** : d'où viennent les gens (google.com, pinterest.com…) ;
+- **Countries** et **Devices** : les pays, et téléphone ou ordinateur.
+
+Choisissez la période en haut à droite (24 heures, 7 jours, 30 jours…).
+Le plan gratuit de Vercel inclut 50 000 événements par mois, largement assez pour démarrer.
+
+Pour savoir **quels mots** les gens tapent sur Google avant d'arriver chez vous, regardez la
+Search Console (étape 5) → **Performances**.
 
 Bon crochet ! 🧶

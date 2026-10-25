@@ -278,5 +278,7 @@ purpose, because the site name sits right next to it.
   differ slightly between the editor and the importer.
 - Covers are cropped 4:5 (portrait, ~1000×1250) for Pinterest; landscape covers get visibly cut off, which is
   why the importer warns about them.
+- **`xlsx` is installed from SheetJS's own CDN** (`https://cdn.sheetjs.com/xlsx-0.20.3/…tgz`), not npm: npm stops at
+  0.18.5, which has a high-severity advisory with no npm fix. Upgrade by changing that URL, never `npm i xlsx`.
 - `next.config.ts` raises the server-action body limit to 8 MB for import batches and whitelists only the
   Supabase storage host for `next/image`. A different storage host needs adding there.

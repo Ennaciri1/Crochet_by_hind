@@ -39,6 +39,7 @@ I love seeing what you make! Share your finished projects on [Pinterest](https:/
 - **Contact form:** when you send a message, we store your name, email address and message so we can reply. We never sell this information, and we do not add you to the mailing list unless you sign up for it yourself.
 - **Mailing list:** if you sign up through the form at the end of a pattern, we store the first name and email address you give us, together with the post you signed up from, so we can send you new patterns.
 - **Log data:** our hosting provider automatically records technical information such as your IP address, browser type and the pages you visit, for security and performance.
+- **Visitor statistics:** we count visits with Vercel Web Analytics to learn which patterns are popular. It uses no cookies and does not identify you: visits are counted anonymously, as totals by page, country, device and referring website.
 - **Cookies:** small files stored on your device, mostly by our advertising partner (see below).
 
 ## Advertising and Google AdSense cookies

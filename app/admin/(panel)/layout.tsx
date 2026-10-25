@@ -54,6 +54,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
             <Link href="/admin/settings">Settings</Link>
             <Link href="/admin/categories">Categories</Link>
             <Link href="/admin/pages">Pages</Link>
+            <a href="https://vercel.com/dashboard" target="_blank" rel="noopener">
+              Visitors ↗
+            </a>
             <Link href="/" target="_blank">
               View site ↗
             </Link>
