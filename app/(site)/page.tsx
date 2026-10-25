@@ -9,6 +9,7 @@ import YarnBall from "@/components/YarnBall";
 import { getCategories, getCategory, yarnVars } from "@/lib/categories";
 import { QUALITY_COVER } from "@/lib/images";
 import { getPostsPage, POSTS_PER_PAGE } from "@/lib/posts";
+import { organizationSchema } from "@/lib/schema";
 import { absoluteUrl, getSiteSettings } from "@/lib/site";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
@@ -33,13 +34,16 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* WebSite + SearchAction: lets Google show a search box for the site */}
+      {/* Who publishes the site (logo, Etsy, Pinterest), then the WebSite with its
+          SearchAction, which lets Google show a search box for the site. */}
+      <JsonLd data={{ "@context": "https://schema.org", ...organizationSchema(site) }} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: site.name,
           url: absoluteUrl("/"),
+          publisher: { "@id": absoluteUrl("/#organization") },
           potentialAction: {
             "@type": "SearchAction",
             target: { "@type": "EntryPoint", urlTemplate: `${absoluteUrl("/search")}?q={search_term_string}` },
@@ -105,7 +109,7 @@ export default async function HomePage() {
 
         <div className="section-head">
           <h2>Latest patterns</h2>
-          <Link href="/category/free-patterns">See all →</Link>
+          <Link href="/blog">See all posts →</Link>
         </div>
 
         {rest.length > 0 ? (

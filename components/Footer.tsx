@@ -14,6 +14,9 @@ export default function Footer({ site, categories }: { site: SiteSettings; categ
           <div>
             <h2>Patterns</h2>
             <ul>
+              <li>
+                <Link href="/blog">All posts</Link>
+              </li>
               {categories.map((c) => (
                 <li key={c.slug}>
                   <Link href={`/category/${c.slug}`}>{c.name}</Link>
@@ -33,6 +36,9 @@ export default function Footer({ site, categories }: { site: SiteSettings; categ
                 <a href={site.pinterest} target="_blank" rel="noopener">
                   Pinterest
                 </a>
+              </li>
+              <li>
+                <a href="/feed.xml">RSS feed</a>
               </li>
               <li>
                 <Link href="/about">About</Link>

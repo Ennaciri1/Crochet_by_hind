@@ -15,6 +15,7 @@ export default function Header({ siteName, categories }: { siteName: string; cat
           {siteName}
         </Link>
         <nav className="main-nav" aria-label="Main">
+          <Link href="/blog">Blog</Link>
           {categories.map((c) => (
             <Link key={c.slug} href={`/category/${c.slug}`}>
               {c.name}

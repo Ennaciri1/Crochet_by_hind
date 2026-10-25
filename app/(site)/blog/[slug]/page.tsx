@@ -14,6 +14,7 @@ import YarnBall from "@/components/YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
 import { getToc, markdownToText, readingTime, renderArticleWithBreak } from "@/lib/markdown";
 import { getAllPublishedSlugs, getPostBySlug, getRelatedPosts } from "@/lib/posts";
+import { authorSchema, organizationSchema, toIsoDuration } from "@/lib/schema";
 import { absoluteUrl, getSiteSettings } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: post.seo_title ? post.seo_title : `${post.title} | ${site.name}` },
     description,
     keywords: post.tags,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: `/blog/${post.slug}`, types: { "application/rss+xml": "/feed.xml" } },
     openGraph: {
       type: "article",
       url: `/blog/${post.slug}`,
@@ -79,15 +80,35 @@ export default async function PostPage({ params }: Props) {
     new URLSearchParams({ url, media: image ?? "", description: post.title }).toString();
 
   // ----- Structured data -----
-  const author = { "@type": "Person", name: site.author, url: absoluteUrl("/about") };
-  const structuredData: Record<string, unknown> = hasPattern
+  // Every post is a BlogPosting (headline, author, dates, publisher + logo).
+  // A post with instructions also gets a HowTo: materials → supply, hook → tool,
+  // one step per paragraph of the pattern.
+  const author = authorSchema(site);
+  const article = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}#article`,
+    headline: post.title,
+    description: post.seo_description || post.excerpt,
+    ...(image ? { image } : {}),
+    author,
+    publisher: organizationSchema(site),
+    datePublished: post.published_at,
+    dateModified: post.updated_at,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    ...(category ? { articleSection: category.name } : {}),
+    ...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
+    wordCount: markdownToText(`${post.content} ${post.pattern}`).split(" ").filter(Boolean).length,
+    inLanguage: "en-US",
+  };
+  const howTo = hasPattern
     ? {
-        // Pattern posts → HowTo (supplies + tools + steps)
         "@context": "https://schema.org",
         "@type": "HowTo",
         name: post.title,
         description: post.excerpt,
-        image,
+        ...(image ? { image } : {}),
+        ...(toIsoDuration(post.time_estimate) ? { timeRequired: toIsoDuration(post.time_estimate) } : {}),
         supply: post.materials
           .filter((m) => !/hook|needle|scissors|marker/i.test(m))
           .map((m) => ({ "@type": "HowToSupply", name: m })),
@@ -106,24 +127,12 @@ export default async function PostPage({ params }: Props) {
         datePublished: post.published_at,
         dateModified: post.updated_at,
       }
-    : {
-        // Tutorials → BlogPosting
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: post.title,
-        description: post.excerpt,
-        image,
-        author,
-        publisher: { "@type": "Organization", name: site.name, url: absoluteUrl("/") },
-        datePublished: post.published_at,
-        dateModified: post.updated_at,
-        mainEntityOfPage: url,
-        keywords: post.tags.join(", "),
-      };
+    : null;
 
   return (
     <article className="wrap" style={yarnVars(category?.color)}>
-      <JsonLd data={structuredData} />
+      <JsonLd data={article} />
+      {howTo && <JsonLd data={howTo} />}
       {post.faq.length > 0 && (
         <JsonLd
           data={{

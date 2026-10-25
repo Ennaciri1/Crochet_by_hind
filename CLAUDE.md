@@ -109,6 +109,10 @@ calls `revalidatePath("/", "layout")` **plus** `/sitemap.xml` and `/robots.txt` 
 outside the layout tree and would otherwise keep serving an unpublished post. New metadata routes need adding
 there.
 
+[app/feed.xml/route.ts](app/feed.xml/route.ts) (RSS, 50 newest posts) is `force-dynamic` for the same reason as
+the sitemap below. Its job is Pinterest auto-publish, which pins each item's cover photo — keep the image in
+both `media:content` and the description.
+
 `app/sitemap.ts` is `force-dynamic`, not ISR. With `revalidate` it came back from the CDN as a plain
 `x-vercel-cache: HIT` with none of the `x-nextjs-prerender` / `x-nextjs-stale-time` headers the page routes
 carry, so it never regenerated — observed frozen for seven hours with new posts missing. A sitemap costs one
@@ -173,6 +177,17 @@ list, and [Lightbox.tsx](components/Lightbox.tsx) lets a reader tap a step photo
 lightbox is mounted once per article and listens on the document, so there is nothing to re-bind per photo; the
 markdown renderer wraps each photo in a `<button class="zoom-btn">` so the affordance is keyboard-reachable
 without any inline script. It is an enhancement — with JavaScript off the photos are still readable inline.
+
+## SEO
+
+- Shared JSON-LD lives in [lib/schema.ts](lib/schema.ts): `organizationSchema()` (name, logo, Etsy/Pinterest
+  `sameAs`, `@id` `/#organization`) is the publisher everywhere. Every post emits a `BlogPosting`; a post with
+  a `pattern` *also* emits a `HowTo`. `timeRequired` must go through `toIsoDuration()` — Google rejects free text.
+- The root layout sets `googleBot: max-image-preview:large` (Google Images/Discover matter for crochet).
+  Child metadata **replaces** `robots` wholesale, so set it only when overriding, via a conditional spread —
+  `robots: undefined` silently drops the site-wide value.
+- A category with no posts is `noindex` and left out of the sitemap until its first post (thin-content guard).
+  The sitemap lists each post's cover under `<image:loc>` and uses real `lastmod` dates, never "now".
 
 ## Ads
 
@@ -269,7 +284,8 @@ purpose, because the site name sits right next to it.
   `Q: … | A: …`), because Excel's Alt+Enter gives only one newline. Prefer `parseFaqText` for anything new.
 - **`REVALIDATE_SECONDS` in [lib/site.ts](lib/site.ts) is dead** — every listing and article page hardcodes
   `revalidate = 300`. Changing the ISR window means editing each one.
-- **Listings paginate by path, not query string.** `/category/[slug]` is page 1 and
+- **Listings paginate by path, not query string.** `/blog` + `/blog/page/[n]` (all posts, [blog/listing.tsx](app/(site)/blog/listing.tsx)) follow the same scheme;
+  a post can therefore never use the slug `page`. `/category/[slug]` is page 1 and
   `/category/[slug]/page/[n]` is the rest, both sharing [listing.tsx](app/(site)/category/[slug]/listing.tsx).
   This exists because reading `searchParams` would opt the route into dynamic rendering and lose the static
   cache. Page 2+ is `noindex, follow` so the category root is the one URL that ranks. The homepage shows the

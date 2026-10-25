@@ -16,7 +16,10 @@ import { getSiteSettings } from "@/lib/site";
  */
 
 export async function categoryMetadata(slug: string, page: number): Promise<Metadata> {
-  const category = await getCategory(slug);
+  const [category, { total }] = await Promise.all([
+    getCategory(slug),
+    getPostsPage({ category: slug, perPage: 1 }),
+  ]);
   if (!category) return {};
 
   const base = slug === "free-patterns" ? "Free Crochet Patterns" : `${category.name} Crochet Patterns`;
@@ -29,7 +32,11 @@ export async function categoryMetadata(slug: string, page: number): Promise<Meta
     alternates: { canonical: path },
     // Page 2 and beyond add nothing for a searcher; keep them crawlable but out
     // of the index so the category root is the one result that ranks.
-    robots: page > 1 ? { index: false, follow: true } : undefined,
+    // An empty category ("come back soon") is thin content that Google holds
+    // against the whole site, so it stays out of the index until its first
+    // post is published — automatically, nothing to do in /admin.
+    // (Spread, not "robots: undefined", which would wipe the site-wide setting.)
+    ...(page > 1 || total === 0 ? { robots: { index: false, follow: true } } : {}),
     openGraph: { url: path, title, description: category.description },
   };
 }

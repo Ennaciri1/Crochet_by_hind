@@ -33,6 +33,15 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: SITE_LOCALE,
     },
     twitter: { card: "summary_large_image" },
+    // Let Google show big photo previews (Google Images, Discover) and full
+    // text snippets. Pages that must stay out of Google set their own robots.
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+    },
+    // Lets browsers and feed readers find the RSS feed from any page.
+    alternates: { types: { "application/rss+xml": [{ url: "/feed.xml", title: site.name }] } },
     // AdSense site verification: <meta name="google-adsense-account" content="ca-pub-...">
     other: site.adsenseClient ? { "google-adsense-account": site.adsenseClient } : {},
   };

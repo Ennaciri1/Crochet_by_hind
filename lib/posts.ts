@@ -131,10 +131,17 @@ export async function searchPosts(q: string): Promise<PostSummary[]> {
   return (data as unknown as PostSummary[]) ?? [];
 }
 
-/** Every published slug + date, for the sitemap and static generation. */
-export async function getAllPublishedSlugs(): Promise<{ slug: string; updated_at: string; category: string }[]> {
-  const query = publishedQuery("slug, updated_at, category");
+export type PublishedSlug = {
+  slug: string;
+  updated_at: string;
+  category: string;
+  cover_url: string | null;
+};
+
+/** Every published slug, date and cover photo, for the sitemap and static generation. */
+export async function getAllPublishedSlugs(): Promise<PublishedSlug[]> {
+  const query = publishedQuery("slug, updated_at, category, cover_url");
   if (!query) return [];
   const { data } = await query.order("published_at", { ascending: false }).limit(5000);
-  return (data as unknown as { slug: string; updated_at: string; category: string }[]) ?? [];
+  return (data as unknown as PublishedSlug[]) ?? [];
 }
