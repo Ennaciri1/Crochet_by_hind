@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // The sitemap lives at /sitemap.xml only. These are the addresses people
+  // commonly type into Search Console instead (or that WordPress uses); without
+  // a redirect they hit the 404 page, and Google reports "the sitemap is an
+  // HTML file". Google follows redirects when it fetches a sitemap.
+  async redirects() {
+    return ["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"].map(
+      (source) => ({ source, destination: "/sitemap.xml", permanent: true }),
+    );
+  },
 };
 
 export default nextConfig;
