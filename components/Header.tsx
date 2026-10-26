@@ -1,8 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import { hasPinterestProfile, PinterestIcon } from "./PinterestFollow";
 import type { Category } from "@/lib/categories";
 
-export default function Header({ siteName, categories }: { siteName: string; categories: Category[] }) {
+export default function Header({
+  siteName,
+  categories,
+  pinterest = "",
+}: {
+  siteName: string;
+  categories: Category[];
+  pinterest?: string;
+}) {
   return (
     <header className="site-header">
       <a href="#main" className="skip-link">
@@ -22,6 +31,12 @@ export default function Header({ siteName, categories }: { siteName: string; cat
             </Link>
           ))}
           <Link href="/search">Search</Link>
+          {hasPinterestProfile(pinterest) && (
+            <a className="nav-pinterest" href={pinterest} target="_blank" rel="noopener" aria-label="Follow on Pinterest">
+              <PinterestIcon size={16} />
+              <span>Follow</span>
+            </a>
+          )}
         </nav>
       </div>
     </header>

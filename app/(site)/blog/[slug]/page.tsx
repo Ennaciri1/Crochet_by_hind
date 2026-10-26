@@ -8,6 +8,7 @@ import CoverImage from "@/components/CoverImage";
 import JsonLd from "@/components/JsonLd";
 import Lightbox from "@/components/Lightbox";
 import PatternCard from "@/components/PatternCard";
+import PinterestFollow from "@/components/PinterestFollow";
 import { PostGrid } from "@/components/PostCard";
 import SubscribeForm from "@/components/SubscribeForm";
 import YarnBall from "@/components/YarnBall";
@@ -265,6 +266,8 @@ export default async function PostPage({ params }: Props) {
             Get it on Etsy
           </a>
         </aside>
+
+        <PinterestFollow url={site.pinterest} />
 
         <AdSlot
           format="display"

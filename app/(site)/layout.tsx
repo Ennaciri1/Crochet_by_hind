@@ -15,7 +15,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const [site, categories] = await Promise.all([getSiteSettings(), getCategories()]);
   return (
     <>
-      <Header siteName={site.name} categories={categories} />
+      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} />
       <main id="main">{children}</main>
       <Footer site={site} categories={categories} />
       <AdSenseScript client={site.adsEnabled ? site.adsenseClient : ""} />

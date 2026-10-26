@@ -9,7 +9,7 @@ export default async function NotFound() {
   const [site, categories] = await Promise.all([getSiteSettings(), getCategories()]);
   return (
     <>
-      <Header siteName={site.name} categories={categories} />
+      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} />
       <main id="main" className="wrap">
         <div className="not-found read">
           <p className="big">404</p>

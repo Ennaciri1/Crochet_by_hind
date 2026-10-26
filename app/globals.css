@@ -1043,6 +1043,43 @@ textarea:focus { border-color: var(--accent); }
 @media (min-width: 640px) {
   .etsy-box { grid-template-columns: auto 1fr auto; }
 }
+/* Follow on Pinterest box (every post) and the nav button */
+.pinterest-box {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem 0 2.5rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: var(--radius);
+  background: var(--tint-rose);
+  border: 2px dashed var(--yarn-rose);
+}
+@media (min-width: 640px) {
+  .pinterest-box { grid-template-columns: auto 1fr auto; }
+}
+.pinterest-box h2 { font-size: clamp(1.15rem, 3vw, 1.3rem); margin: 0 0 0.3rem; }
+.pinterest-box p { margin: 0; color: var(--ink-soft); font-size: 0.98rem; }
+.pinterest-badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e60023;
+  color: #fff;
+}
+/* Pinterest red; white text on it is 4.9:1 (AA). */
+.btn-pinterest { background: #e60023; border-color: #e60023; color: #fff; }
+@media (hover: hover) {
+  .btn-pinterest:hover { background: #ad081b; border-color: #ad081b; color: #fff; }
+}
+.main-nav .nav-pinterest {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #e60023;
+  font-weight: 650;
+}
 .etsy-box h2 { font-size: clamp(1.15rem, 3vw, 1.3rem); margin: 0 0 0.3rem; }
 .etsy-box p { margin: 0; color: var(--ink-soft); font-size: 0.98rem; }
 
@@ -1366,6 +1403,7 @@ textarea:focus { border-color: var(--accent); }
   .post-actions,
   .toc,
   .etsy-box,
+  .pinterest-box,
   .subscribe,
   .related,
   .pagination,
