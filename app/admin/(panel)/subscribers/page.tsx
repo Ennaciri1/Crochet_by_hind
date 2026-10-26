@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { deleteSubscriber } from "../../actions";
+import { listBrevoContacts } from "@/lib/brevo";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import ExportButton from "./ExportButton";
@@ -10,10 +11,11 @@ type Row = { id: string; name: string; email: string; source: string; created_at
 
 export default async function SubscribersPage() {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("subscribers")
-    .select("id, name, email, source, created_at")
-    .order("created_at", { ascending: false });
+  // The site's own sign-ups (Supabase) and the whole Brevo mailing list, read in parallel.
+  const [{ data, error }, brevo] = await Promise.all([
+    supabase.from("subscribers").select("id, name, email, source, created_at").order("created_at", { ascending: false }),
+    listBrevoContacts(),
+  ]);
 
   const rows = (data ?? []) as Row[];
 
@@ -41,9 +43,16 @@ export default async function SubscribersPage() {
 
       <div className="stats">
         <div className="stat">
-          <b>{rows.length}</b> email{rows.length === 1 ? "" : "s"} collected
+          <b>{rows.length}</b> from the website
         </div>
+        {brevo.configured && !brevo.error && (
+          <div className="stat">
+            <b>{brevo.contacts.filter((c) => !c.unsubscribed).length}</b> active in Brevo
+          </div>
+        )}
       </div>
+
+      <h2 style={{ marginTop: "1.5rem" }}>Sign-ups on the website</h2>
 
       {rows.length === 0 ? (
         <p className="empty">
@@ -81,6 +90,55 @@ export default async function SubscribersPage() {
                     </button>
                   </form>
                 </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* ---------- Everyone in Brevo, whatever form they used ---------- */}
+      <h2 style={{ marginTop: "2.5rem" }}>Everyone in Brevo</h2>
+      <p className="muted">
+        Your whole mailing list as Brevo sees it — including people who signed up through a Brevo form outside the
+        website. To send them an email, use Brevo itself (brevo.com → Campaigns).
+      </p>
+
+      {!brevo.configured ? (
+        <p className="notice notice-error">
+          Brevo is not connected to the website yet. In Vercel → your project → Settings → Environment Variables,
+          add <code>BREVO_API_KEY</code> (Brevo → SMTP &amp; API → API keys), then redeploy.
+        </p>
+      ) : brevo.error ? (
+        <p className="notice notice-error">Could not load the Brevo contacts: {brevo.error}. Try again in a minute.</p>
+      ) : brevo.contacts.length === 0 ? (
+        <p className="empty">No contacts in Brevo yet.</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>List</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {brevo.contacts.map((c) => (
+              <tr key={c.id}>
+                <td data-label="Email">
+                  <a href={`mailto:${c.email}`}>{c.email}</a>
+                </td>
+                <td data-label="Name">{c.name || <span className="muted">—</span>}</td>
+                <td data-label="List">{c.lists.length ? c.lists.join(", ") : <span className="muted">—</span>}</td>
+                <td data-label="Status">
+                  {c.unsubscribed ? (
+                    <span className="badge badge-draft">Unsubscribed</span>
+                  ) : (
+                    <span className="badge badge-published">Subscribed</span>
+                  )}
+                </td>
+                <td data-label="Date">{c.createdAt ? formatDate(c.createdAt) : "—"}</td>
               </tr>
             ))}
           </tbody>
