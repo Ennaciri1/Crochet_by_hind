@@ -37,9 +37,13 @@ const nextConfig: NextConfig = {
       destination: `https://www.crochethenouda.com${source === "/" ? "/" : "/:path"}`,
       permanent: true,
     }));
-    const sitemaps = ["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"].map(
-      (source) => ({ source, destination: "/sitemap.xml", permanent: true }),
-    );
+    // Any other address whose name contains "sitemap" (Sitemap.xml, sitemaps.xml,
+    // post-sitemap.xml, sitemap.xml.gz…) also lands on the real one, instead of
+    // the HTML 404 page that Search Console reports as "the sitemap is an HTML file".
+    const sitemaps = [
+      ...["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"],
+      "/:file((?!sitemap\\.xml$)[^/]*[sS][iI][tT][eE][-_]?[mM][aA][pP][^/]*)",
+    ].map((source) => ({ source, destination: "/sitemap.xml", permanent: true }));
     return [...toWww, ...sitemaps];
   },
 };
