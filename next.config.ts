@@ -24,10 +24,23 @@ const nextConfig: NextConfig = {
   // commonly type into Search Console instead (or that WordPress uses); without
   // a redirect they hit the 404 page, and Google reports "the sitemap is an
   // HTML file". Google follows redirects when it fetches a sitemap.
+  //
+  // The bare domain (crochethenouda.com) sends visitors to www, except for
+  // /ads.txt: AdSense checks that file on the domain you registered and kept
+  // reporting "Not found" while it was behind a redirect, so it is answered
+  // directly there. This only takes effect once the bare domain is set to serve
+  // the site (not redirect) in Vercel → Settings → Domains.
   async redirects() {
-    return ["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"].map(
+    const toWww = ["/", "/:path((?!ads\\.txt$).+)"].map((source) => ({
+      source,
+      has: [{ type: "host" as const, value: "crochethenouda.com" }],
+      destination: `https://www.crochethenouda.com${source === "/" ? "/" : "/:path"}`,
+      permanent: true,
+    }));
+    const sitemaps = ["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"].map(
       (source) => ({ source, destination: "/sitemap.xml", permanent: true }),
     );
+    return [...toWww, ...sitemaps];
   },
 };
 
