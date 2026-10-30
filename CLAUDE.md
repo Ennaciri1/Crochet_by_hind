@@ -195,7 +195,11 @@ AdSense ids come from `settings` (DB), not env, and are threaded from server com
 [AdSlot](components/AdSlot.tsx) as props. `adsEnabled` is an owner kill switch: callers pass
 `site.adsEnabled ? site.adsenseClient : ""` and an empty client renders nothing (a dashed placeholder in dev).
 [AdSenseScript](components/AdSenseScript.tsx) loads only in the public layout, never in `/admin`.
-[app/ads.txt/route.ts](app/ads.txt/route.ts) derives `pub-…` from the stored `ca-pub-…`.
+[app/ads.txt/route.ts](app/ads.txt/route.ts) derives `pub-…` from the stored `ca-pub-…`; on a database error
+it throws so ISR keeps the last good file, because even five minutes of an empty ads.txt shows up in AdSense
+as "Not found". The bare domain `crochethenouda.com` is connected to Production in Vercel (not a Vercel
+domain redirect): `redirects()` in `next.config.ts` sends every path except `/ads.txt` to www, so AdSense
+reads ads.txt on the registered domain without a redirect. Don't turn the Vercel redirect back on.
 
 ## Bulk import (`/admin/import`)
 
