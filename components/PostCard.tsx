@@ -35,13 +35,13 @@ export default async function PostCard({ post, priority = false }: { post: PostS
   );
 }
 
-export function PostGrid({ posts }: { posts: PostSummary[] }) {
+export function PostGrid({ posts, eager = 2 }: { posts: PostSummary[]; eager?: number }) {
   return (
     <ul className="post-grid">
       {posts.map((post, i) => (
         <li key={post.id}>
           {/* The first two cards are usually above the fold, so they load eagerly. */}
-          <PostCard post={post} priority={i < 2} />
+          <PostCard post={post} priority={i < eager} />
         </li>
       ))}
     </ul>

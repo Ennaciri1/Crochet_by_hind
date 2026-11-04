@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { cache } from "react";
+import { BARE_HOST, WWW_HOST } from "./domain";
 import { getPublicClient } from "./supabase/public";
 
 /**
@@ -7,13 +9,15 @@ import { getPublicClient } from "./supabase/public";
  * env var rather than a DB setting.
  */
 function resolveSiteUrl() {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return explicit.replace(/\/+$/, "");
-  // Vercel sets this on every deployment, so canonical links and the sitemap stay
-  // correct even when NEXT_PUBLIC_SITE_URL was never added to the project.
+  // Vercel sets VERCEL_PROJECT_PRODUCTION_URL on every deployment, so canonical links
+  // and the sitemap stay correct even when NEXT_PUBLIC_SITE_URL was never added to the project.
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return `https://${vercel}`;
-  return "http://localhost:3000";
+  const url = new URL(process.env.NEXT_PUBLIC_SITE_URL || (vercel ? `https://${vercel}` : "http://localhost:3000"));
+  // Vercel names the *shortest* production domain, which became the bare one once it
+  // was connected for ads.txt. Pages there redirect to www, so every canonical link and
+  // sitemap entry was pointing Google at a redirect instead of at the page itself.
+  if (url.hostname === BARE_HOST) url.hostname = WWW_HOST;
+  return url.origin;
 }
 
 export const SITE_URL = resolveSiteUrl();
@@ -70,6 +74,28 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
     adsEnabled: data.ads_enabled ?? true,
   };
 });
+
+type OpenGraph = NonNullable<Metadata["openGraph"]>;
+
+/**
+ * Open Graph tags: what Facebook, Pinterest and messaging apps show when a link
+ * is shared. Next does not merge a page's `openGraph` with the layout's, it
+ * replaces it, so every page that set its own og:url was silently losing the
+ * site name, the locale and the picture (the home page was shared with no image
+ * at all). Every `openGraph` therefore goes through here; a post passes its
+ * cover photo in `images`, which replaces the default picture.
+ */
+export async function siteOpenGraph(fields: OpenGraph = {}): Promise<OpenGraph> {
+  const site = await getSiteSettings();
+  return {
+    type: "website",
+    siteName: site.name,
+    locale: SITE_LOCALE,
+    // Drawn by app/opengraph-image.tsx.
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, type: "image/png", alt: "Free crochet patterns" }],
+    ...fields,
+  };
+}
 
 /** Builds an absolute URL from a path, e.g. absoluteUrl("/blog/x"). */
 export function absoluteUrl(path = "/") {

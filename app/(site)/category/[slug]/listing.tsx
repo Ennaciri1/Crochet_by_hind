@@ -7,7 +7,7 @@ import Pagination from "@/components/Pagination";
 import { PostGrid } from "@/components/PostCard";
 import { getCategories, getCategory } from "@/lib/categories";
 import { getPostsPage } from "@/lib/posts";
-import { getSiteSettings } from "@/lib/site";
+import { getSiteSettings, siteOpenGraph } from "@/lib/site";
 
 /**
  * One category listing, shared by /category/[slug] (page 1) and
@@ -37,7 +37,7 @@ export async function categoryMetadata(slug: string, page: number): Promise<Meta
     // post is published — automatically, nothing to do in /admin.
     // (Spread, not "robots: undefined", which would wipe the site-wide setting.)
     ...(page > 1 || total === 0 ? { robots: { index: false, follow: true } } : {}),
-    openGraph: { url: path, title, description: category.description },
+    openGraph: await siteOpenGraph({ url: path, title, description: category.description }),
   };
 }
 

@@ -10,15 +10,20 @@ import { getCategories, getCategory, yarnVars } from "@/lib/categories";
 import { QUALITY_COVER } from "@/lib/images";
 import { getPostsPage, POSTS_PER_PAGE } from "@/lib/posts";
 import { organizationSchema } from "@/lib/schema";
-import { absoluteUrl, getSiteSettings } from "@/lib/site";
+import { absoluteUrl, getSiteSettings, siteOpenGraph } from "@/lib/site";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
   return {
-    alternates: { canonical: "/" },
-    openGraph: { url: "/", title: `${site.name} – Free Crochet Patterns`, description: site.description },
+    // The RSS link is repeated because a page's `alternates` replaces the layout's.
+    alternates: { canonical: "/", types: { "application/rss+xml": "/feed.xml" } },
+    openGraph: await siteOpenGraph({
+      url: "/",
+      title: `${site.name} – Free Crochet Patterns`,
+      description: site.description,
+    }),
   };
 }
 
@@ -55,8 +60,10 @@ export default async function HomePage() {
       <div className="wrap">
         <section className="hero">
           <div className="hero-text">
-            <span className="eyebrow">Free crochet patterns · US terms</span>
+            {/* The eyebrow sits inside the h1 so the page's main heading names what
+                people search for, not only the tagline. */}
             <h1>
+              <span className="eyebrow">Free crochet patterns · US terms</span>
               Happy little things to make with <span className="hl">cotton yarn</span> and a hook.
             </h1>
             <p className="hero-lede">
@@ -113,7 +120,9 @@ export default async function HomePage() {
         </div>
 
         {rest.length > 0 ? (
-          <PostGrid posts={rest} />
+          // The hero and the category tiles fill the first screen here, so no card
+          // photo is preloaded: it would compete with the hero photo.
+          <PostGrid posts={rest} eager={0} />
         ) : (
           <p className="empty">
             {newest ? "More patterns are on the hook. Come back soon!" : "No posts yet. Write your first one in /admin."}

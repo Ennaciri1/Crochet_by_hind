@@ -16,7 +16,7 @@ import { getCategory, yarnVars } from "@/lib/categories";
 import { getToc, markdownToText, readingTime, renderArticleWithBreak } from "@/lib/markdown";
 import { getAllPublishedSlugs, getPostBySlug, getRelatedPosts } from "@/lib/posts";
 import { authorSchema, organizationSchema, toIsoDuration } from "@/lib/schema";
-import { absoluteUrl, getSiteSettings } from "@/lib/site";
+import { absoluteUrl, getSiteSettings, siteOpenGraph } from "@/lib/site";
 import { formatDate } from "@/lib/utils";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     keywords: post.tags,
     alternates: { canonical: `/blog/${post.slug}`, types: { "application/rss+xml": "/feed.xml" } },
-    openGraph: {
+    openGraph: await siteOpenGraph({
       type: "article",
       url: `/blog/${post.slug}`,
       title,
@@ -53,8 +53,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       modifiedTime: post.updated_at,
       authors: [site.author],
       tags: post.tags,
-      images: image ? [{ url: image, alt: post.cover_alt || post.title, width: 1000, height: 1250 }] : undefined,
-    },
+      // Without a cover photo the site's default picture stays.
+      ...(image ? { images: [{ url: image, alt: post.cover_alt || post.title, width: 1000, height: 1250 }] } : {}),
+    }),
     twitter: { card: "summary_large_image", title, description, images: image ? [image] : undefined },
   };
 }

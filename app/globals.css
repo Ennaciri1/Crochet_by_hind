@@ -331,6 +331,8 @@ svg { max-width: 100%; }
 }
 .hero-text { max-width: 36rem; }
 .hero h1 { margin-bottom: 0.6rem; }
+/* The eyebrow is inside the h1 (for search) but still looks like a small label on its own line. */
+.hero h1 .eyebrow { display: block; line-height: 1.7; }
 
 .hero-art { position: relative; padding: 1.25rem clamp(0.5rem, 4vw, 2.5rem); }
 .hero-art .deco { position: absolute; z-index: 0; }

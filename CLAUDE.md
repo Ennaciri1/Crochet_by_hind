@@ -120,7 +120,11 @@ indexed query and crawlers fetch it rarely, so correctness beats caching here. T
 `npm run import:posts`, which runs outside the app and so cannot call `revalidatePath` at all.
 
 `SITE_URL` resolution order ([lib/site.ts](lib/site.ts)): `NEXT_PUBLIC_SITE_URL` → Vercel's
-`VERCEL_PROJECT_PRODUCTION_URL` → localhost. It is build-time only, deliberately not a DB setting.
+`VERCEL_PROJECT_PRODUCTION_URL` → localhost. It is build-time only, deliberately not a DB setting. Whatever the
+source, the bare domain is then swapped for www ([lib/domain.ts](lib/domain.ts), dependency-free and shared with
+the redirect in `next.config.ts`). `NEXT_PUBLIC_SITE_URL` is not set in Vercel, and Vercel's variable names the
+*shortest* production domain, which became the bare one when it was connected for ads.txt. Production had never
+served a correct canonical before this: first `http://localhost:3000`, then a bare-domain address that redirects.
 
 ## Images: everything goes through the optimizer
 
@@ -128,7 +132,8 @@ indexed query and crawlers fetch it rarely, so correctness beats caching here. T
 dependency-free because **next.config.ts imports it** for the Supabase remote-pattern host.
 
 - Covers and cards use `<Image>` via [CoverImage](components/CoverImage.tsx), inside a parent that owns the
-  aspect ratio, so there is no layout shift.
+  aspect ratio, so there is no layout shift. `PostGrid`'s `eager` (default 2) is how many card photos are
+  preloaded; the home page passes 0 because its hero photo is the one that must win the first screen.
 - Body photos are plain Markdown and cannot use `<Image>`, so the `image` renderer in
   [lib/markdown.ts](lib/markdown.ts) hand-builds the same `/_next/image?url=…&w=…&q=…` URLs plus a `srcset`.
   Before this, a step photo served its Supabase original — 3.2 MB of PNG on a phone.
@@ -185,7 +190,10 @@ without any inline script. It is an enhancement — with JavaScript off the phot
   a `pattern` *also* emits a `HowTo`. `timeRequired` must go through `toIsoDuration()` — Google rejects free text.
 - The root layout sets `googleBot: max-image-preview:large` (Google Images/Discover matter for crochet).
   Child metadata **replaces** `robots` wholesale, so set it only when overriding, via a conditional spread —
-  `robots: undefined` silently drops the site-wide value.
+  `robots: undefined` silently drops the site-wide value. `openGraph` and `alternates` are replaced the same way:
+  every `openGraph` is built with `siteOpenGraph()` in [lib/site.ts](lib/site.ts) (site name, locale, default
+  picture — the home page used to be shared with no image), and a page that sets a canonical repeats the RSS
+  `types` if it should keep the feed link.
 - A category with no posts is `noindex` and left out of the sitemap until its first post (thin-content guard).
   The sitemap lists each post's cover under `<image:loc>` and uses real `lastmod` dates, never "now".
 

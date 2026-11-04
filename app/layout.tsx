@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Source_Serif_4 } from "next/font/google";
-import { getSiteSettings, SITE_LOCALE, SITE_URL } from "@/lib/site";
+import { getSiteSettings, SITE_URL, siteOpenGraph } from "@/lib/site";
 import "./globals.css";
 
 // Fonts are self-hosted by next/font: no layout shift, no request to Google at runtime.
@@ -27,11 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: site.description,
     applicationName: site.name,
     authors: [{ name: site.author }],
-    openGraph: {
-      type: "website",
-      siteName: site.name,
-      locale: SITE_LOCALE,
-    },
+    openGraph: await siteOpenGraph(),
     twitter: { card: "summary_large_image" },
     // Let Google show big photo previews (Google Images, Discover) and full
     // text snippets. Pages that must stay out of Google set their own robots.

@@ -9,7 +9,7 @@ import { PostGrid } from "@/components/PostCard";
 import { getCategories } from "@/lib/categories";
 import { getPostsPage } from "@/lib/posts";
 import { organizationSchema } from "@/lib/schema";
-import { absoluteUrl, getSiteSettings } from "@/lib/site";
+import { absoluteUrl, getSiteSettings, siteOpenGraph } from "@/lib/site";
 
 /**
  * The blog index: every published post, newest first, shared by /blog (page 1)
@@ -24,7 +24,7 @@ const TITLE = "Free Crochet Patterns & Tutorials";
 const DESCRIPTION =
   "Every free crochet pattern and tutorial on the blog, newest first: amigurumi, wearables, home decor and step-by-step lessons in US terms.";
 
-export function blogMetadata(page: number): Metadata {
+export async function blogMetadata(page: number): Promise<Metadata> {
   const title = page > 1 ? `${TITLE} — Page ${page}` : `Blog: ${TITLE}`;
   const path = page > 1 ? `/blog/page/${page}` : "/blog";
   return {
@@ -38,7 +38,7 @@ export function blogMetadata(page: number): Metadata {
     // index, so /blog is the one listing URL that ranks.
     // (Spread, not "robots: undefined", which would wipe the site-wide setting.)
     ...(page > 1 ? { robots: { index: false, follow: true } } : {}),
-    openGraph: { url: path, title, description: DESCRIPTION },
+    openGraph: await siteOpenGraph({ url: path, title, description: DESCRIPTION }),
   };
 }
 

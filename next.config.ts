@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { BARE_HOST, WWW_HOST } from "./lib/domain";
 import { supabaseImageHost } from "./lib/images";
 
 const nextConfig: NextConfig = {
@@ -33,8 +34,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     const toWww = ["/", "/:path((?!ads\\.txt$).+)"].map((source) => ({
       source,
-      has: [{ type: "host" as const, value: "crochethenouda.com" }],
-      destination: `https://www.crochethenouda.com${source === "/" ? "/" : "/:path"}`,
+      has: [{ type: "host" as const, value: BARE_HOST }],
+      destination: `https://${WWW_HOST}${source === "/" ? "/" : "/:path"}`,
       permanent: true,
     }));
     // Any other address whose name contains "sitemap" (Sitemap.xml, sitemaps.xml,
