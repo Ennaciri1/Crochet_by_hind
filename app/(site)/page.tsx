@@ -63,7 +63,7 @@ export default async function HomePage() {
             <p className="eyebrow">Clear instructions · US terms</p>
             {/* The main heading says what people search for; the friendly tagline opens the intro. */}
             <h1>
-              Free easy <span className="hl">crochet patterns</span> and step-by-step tutorials
+              Free easy <span className="hl">crochet patterns</span> and tutorials
             </h1>
             <p className="hero-lede">
               Happy little things to make with yarn and a hook: granny square cardigans, amigurumi friends, Christmas
