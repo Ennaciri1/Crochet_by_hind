@@ -188,6 +188,9 @@ without any inline script. It is an enhancement — with JavaScript off the phot
 - Shared JSON-LD lives in [lib/schema.ts](lib/schema.ts): `organizationSchema()` (name, logo, Etsy/Pinterest
   `sameAs`, `@id` `/#organization`) is the publisher everywhere. Every post emits a `BlogPosting`; a post with
   a `pattern` *also* emits a `HowTo`. `timeRequired` must go through `toIsoDuration()` — Google rejects free text.
+- The home `<title>` is `homeTitle()` in [lib/site.ts](lib/site.ts) and each category's title and H1 are
+  `categoryHeading()` in [lib/categories.ts](lib/categories.ts): search phrases, while the menu keeps the short
+  name from /admin. The home meta description is `settings.description`, edited at /admin/settings.
 - The root layout sets `googleBot: max-image-preview:large` (Google Images/Discover matter for crochet).
   Child metadata **replaces** `robots` wholesale, so set it only when overriding, via a conditional spread —
   `robots: undefined` silently drops the site-wide value. `openGraph` and `alternates` are replaced the same way:

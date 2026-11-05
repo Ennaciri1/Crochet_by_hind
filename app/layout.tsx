@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Source_Serif_4 } from "next/font/google";
-import { getSiteSettings, SITE_URL, siteOpenGraph } from "@/lib/site";
+import { getSiteSettings, homeTitle, SITE_URL, siteOpenGraph } from "@/lib/site";
 import "./globals.css";
 
 // Fonts are self-hosted by next/font: no layout shift, no request to Google at runtime.
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: `${site.name} – Free Crochet Patterns`,
+      default: homeTitle(site.name),
       template: `%s | ${site.name}`,
     },
     description: site.description,

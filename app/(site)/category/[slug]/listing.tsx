@@ -5,7 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { CategoryPills } from "@/components/CategoryNav";
 import Pagination from "@/components/Pagination";
 import { PostGrid } from "@/components/PostCard";
-import { getCategories, getCategory } from "@/lib/categories";
+import { categoryHeading, getCategories, getCategory } from "@/lib/categories";
 import { getPostsPage } from "@/lib/posts";
 import { getSiteSettings, siteOpenGraph } from "@/lib/site";
 
@@ -22,8 +22,8 @@ export async function categoryMetadata(slug: string, page: number): Promise<Meta
   ]);
   if (!category) return {};
 
-  const base = slug === "free-patterns" ? "Free Crochet Patterns" : `${category.name} Crochet Patterns`;
-  const title = page > 1 ? `${base} — Page ${page}` : base;
+  const heading = categoryHeading(category);
+  const title = page > 1 ? `${heading} — Page ${page}` : heading;
   const path = page > 1 ? `/category/${slug}/page/${page}` : `/category/${slug}`;
 
   return {
@@ -56,7 +56,7 @@ export default async function CategoryListing({ slug, page }: { slug: string; pa
     <div className="wrap">
       <header className="page-head category-head">
         <Breadcrumbs items={[{ name: category.name, href: `/category/${slug}` }]} />
-        <h1>{category.name}</h1>
+        <h1>{categoryHeading(category)}</h1>
         <p>{category.description}</p>
         <CategoryPills categories={categories} current={slug} />
       </header>

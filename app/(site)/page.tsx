@@ -10,7 +10,7 @@ import { getCategories, getCategory, yarnVars } from "@/lib/categories";
 import { QUALITY_COVER } from "@/lib/images";
 import { getPostsPage, POSTS_PER_PAGE } from "@/lib/posts";
 import { organizationSchema } from "@/lib/schema";
-import { absoluteUrl, getSiteSettings, siteOpenGraph } from "@/lib/site";
+import { absoluteUrl, getSiteSettings, homeTitle, siteOpenGraph } from "@/lib/site";
 
 export const revalidate = 300; // ISR: rebuild at most every 5 minutes
 
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/", types: { "application/rss+xml": "/feed.xml" } },
     openGraph: await siteOpenGraph({
       url: "/",
-      title: `${site.name} – Free Crochet Patterns`,
+      title: homeTitle(site.name),
       description: site.description,
     }),
   };
@@ -60,15 +60,14 @@ export default async function HomePage() {
       <div className="wrap">
         <section className="hero">
           <div className="hero-text">
-            {/* The eyebrow sits inside the h1 so the page's main heading names what
-                people search for, not only the tagline. */}
+            <p className="eyebrow">Clear instructions · US terms</p>
+            {/* The main heading says what people search for; the friendly tagline opens the intro. */}
             <h1>
-              <span className="eyebrow">Free crochet patterns · US terms</span>
-              Happy little things to make with <span className="hl">cotton yarn</span> and a hook.
+              Free easy <span className="hl">crochet patterns</span> and step-by-step tutorials
             </h1>
             <p className="hero-lede">
-              Clear, tested patterns for beginners and seasoned makers: amigurumi friends, cozy wearables and
-              colorful pieces for your home. Every pattern is free to read here.
+              Happy little things to make with yarn and a hook: granny square cardigans, amigurumi friends, Christmas
+              ornaments and colorful pieces for your home. Read the free patterns here, or get ad-free PDFs on Etsy.
             </p>
             <div className="hero-actions">
               <Link className="btn btn-primary" href="/category/free-patterns">
