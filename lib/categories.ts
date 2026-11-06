@@ -16,31 +16,31 @@ const fallbackCategories: Category[] = [
     slug: "free-patterns",
     color: "rose",
     name: "Free patterns",
-    description: "Free crochet patterns with clear US-term instructions, stitch counts and printable pattern cards.",
+    description: "Free crochet patterns with step-by-step photos, stitch counts and clear US terms: granny square cardigans, bucket hats, ornaments and coasters.",
   },
   {
     slug: "amigurumi",
     color: "butter",
     name: "Amigurumi",
-    description: "Free amigurumi patterns: small crocheted animals, dolls and toys, worked in the round.",
+    description: "Cute amigurumi crochet patterns, from a Christmas gingerbread man to a giant strawberry plush. Easy, worked in the round, with printable PDF patterns.",
   },
   {
     slug: "wearables",
     color: "lilac",
     name: "Wearables",
-    description: "Free crochet patterns for hats, scarves, sweaters, bags and other things you can wear.",
+    description: "Crochet patterns and ideas for things you can wear: granny square cardigans, hexagon cardigans and summer mesh hats, in clear US terms.",
   },
   {
     slug: "home-decor",
     color: "mint",
     name: "Home decor",
-    description: "Free crochet patterns for blankets, pillows, coasters, baskets and cozy home accents.",
+    description: "Crochet home decor patterns: chunky storage baskets with handles, Christmas garlands and ornaments, with easy printable PDF patterns.",
   },
   {
     slug: "tutorials",
     color: "sky",
     name: "Tutorials",
-    description: "Step-by-step crochet tutorials: stitches, techniques, reading patterns and finishing tips.",
+    description: "Crochet tutorials for beginners: how to read a pattern, a hook size chart, US vs UK terms and more step-by-step guides.",
   },
 ];
 
@@ -57,6 +57,22 @@ export const getCategories = cache(async (): Promise<Category[]> => {
 export async function getCategory(slug: string | null | undefined) {
   const categories = await getCategories();
   return categories.find((c) => c.slug === slug);
+}
+
+/**
+ * What each category is called in Google and in its page heading. The menu keeps
+ * the short name set in /admin ("Wearables"), which nobody searches for.
+ */
+const searchHeadings: Record<string, string> = {
+  "free-patterns": "Free Crochet Patterns",
+  amigurumi: "Amigurumi Crochet Patterns",
+  wearables: "Crochet Cardigan and Hat Patterns",
+  "home-decor": "Crochet Home Decor Patterns",
+  tutorials: "Crochet Tutorials for Beginners",
+};
+
+export function categoryHeading(category: Category) {
+  return searchHeadings[category.slug] ?? `${category.name} Crochet Patterns`;
 }
 
 export const difficulties = ["beginner", "easy", "intermediate", "experienced"] as const;

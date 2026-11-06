@@ -66,7 +66,7 @@ create table if not exists public.settings (
   contact_email           text not null default 'hello@example.com',
   etsy_url                text not null default 'https://www.etsy.com',
   pinterest_url           text not null default 'https://www.pinterest.com',
-  description             text not null default 'Free crochet patterns with clear US-term instructions: amigurumi, wearables, home decor and beginner tutorials.',
+  description             text not null default 'Free easy crochet patterns and tutorials in US terms: granny square cardigans, amigurumi, Christmas ornaments and home decor, plus printable PDFs on Etsy.',
   ads_enabled             boolean not null default true,
   adsense_client          text not null default '',
   adsense_slot_in_article text not null default '',
@@ -96,11 +96,11 @@ create table if not exists public.categories (
 );
 
 insert into public.categories (slug, name, color, description, sort_order) values
-  ('free-patterns', 'Free patterns', 'rose',   'Free crochet patterns with clear US-term instructions, stitch counts and printable pattern cards.', 1),
-  ('amigurumi',     'Amigurumi',     'butter', 'Free amigurumi patterns: small crocheted animals, dolls and toys, worked in the round.', 2),
-  ('wearables',     'Wearables',     'lilac',  'Free crochet patterns for hats, scarves, sweaters, bags and other things you can wear.', 3),
-  ('home-decor',    'Home decor',    'mint',   'Free crochet patterns for blankets, pillows, coasters, baskets and cozy home accents.', 4),
-  ('tutorials',     'Tutorials',     'sky',    'Step-by-step crochet tutorials: stitches, techniques, reading patterns and finishing tips.', 5)
+  ('free-patterns', 'Free patterns', 'rose',   'Free crochet patterns with step-by-step photos, stitch counts and clear US terms: granny square cardigans, bucket hats, ornaments and coasters.', 1),
+  ('amigurumi',     'Amigurumi',     'butter', 'Cute amigurumi crochet patterns, from a Christmas gingerbread man to a giant strawberry plush. Easy, worked in the round, with printable PDF patterns.', 2),
+  ('wearables',     'Wearables',     'lilac',  'Crochet patterns and ideas for things you can wear: granny square cardigans, hexagon cardigans and summer mesh hats, in clear US terms.', 3),
+  ('home-decor',    'Home decor',    'mint',   'Crochet home decor patterns: chunky storage baskets with handles, Christmas garlands and ornaments, with easy printable PDF patterns.', 4),
+  ('tutorials',     'Tutorials',     'sky',    'Crochet tutorials for beginners: how to read a pattern, a hook size chart, US vs UK terms and more step-by-step guides.', 5)
 on conflict (slug) do nothing;
 
 drop trigger if exists categories_set_updated_at on public.categories;

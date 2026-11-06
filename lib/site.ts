@@ -23,6 +23,12 @@ function resolveSiteUrl() {
 export const SITE_URL = resolveSiteUrl();
 export const SITE_LOCALE = "en_US";
 
+/**
+ * The home page title. It opens with the words people type into Google and ends
+ * with the site name, like every other page ("Page title | Site name").
+ */
+export const homeTitle = (siteName: string) => `Free Easy Crochet Patterns & Tutorials | ${siteName}`;
+
 export type SiteSettings = {
   name: string;
   author: string;
@@ -45,7 +51,7 @@ const envDefaults: SiteSettings = {
   etsy: process.env.NEXT_PUBLIC_ETSY_SHOP_URL || "https://www.etsy.com",
   pinterest: process.env.NEXT_PUBLIC_PINTEREST_URL || "https://www.pinterest.com",
   description:
-    "Free crochet patterns with clear US-term instructions: amigurumi, wearables, home decor and beginner tutorials.",
+    "Free easy crochet patterns and tutorials in US terms: granny square cardigans, amigurumi, Christmas ornaments and home decor, plus printable PDFs on Etsy.",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",
   adsenseSlotInArticle: process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_ARTICLE || "",
   adsenseSlotDisplay: process.env.NEXT_PUBLIC_ADSENSE_SLOT_DISPLAY || "",
