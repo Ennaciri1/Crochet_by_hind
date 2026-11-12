@@ -36,6 +36,7 @@ export type SiteSettings = {
   bio: string;
   etsy: string;
   pinterest: string;
+  instagram: string;
   description: string;
   adsenseClient: string;
   adsenseSlotInArticle: string;
@@ -50,6 +51,8 @@ const envDefaults: SiteSettings = {
   bio: "",
   etsy: process.env.NEXT_PUBLIC_ETSY_SHOP_URL || "https://www.etsy.com",
   pinterest: process.env.NEXT_PUBLIC_PINTEREST_URL || "https://www.pinterest.com",
+  // The real profile, so the link shows even before supabase/add-instagram.sql has run.
+  instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/crochet_henouda/",
   description:
     "Free easy crochet patterns and tutorials in US terms: granny square cardigans, amigurumi, Christmas ornaments and home decor, plus printable PDFs on Etsy.",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",
@@ -73,6 +76,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
     bio: data.author_bio || envDefaults.bio,
     etsy: data.etsy_url || envDefaults.etsy,
     pinterest: data.pinterest_url || envDefaults.pinterest,
+    instagram: data.instagram_url || envDefaults.instagram,
     description: data.description || envDefaults.description,
     adsenseClient: data.adsense_client || "",
     adsenseSlotInArticle: data.adsense_slot_in_article || "",
