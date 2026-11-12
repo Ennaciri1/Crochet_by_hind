@@ -45,7 +45,13 @@ const nextConfig: NextConfig = {
       ...["/sitemap", "/sitemap.html", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"],
       "/:file((?!sitemap\\.xml$)[^/]*[sS][iI][tT][eE][-_]?[mM][aA][pP][^/]*)",
     ].map((source) => ({ source, destination: "/sitemap.xml", permanent: true }));
-    return [...toWww, ...sitemaps];
+    // The same sunflower cardigan pattern was published twice (the second post is
+    // only another colourway). Two near-identical pages read as thin, duplicate
+    // content to Google and AdSense, so the copy now points to the original post.
+    const duplicates = [
+      ["sunflower-granny-square-cardigan-free-pattern-rust-sage", "sunflower-granny-square-crochet-cardigan"],
+    ].map(([from, to]) => ({ source: `/blog/${from}`, destination: `/blog/${to}`, permanent: true }));
+    return [...toWww, ...sitemaps, ...duplicates];
   },
 };
 
