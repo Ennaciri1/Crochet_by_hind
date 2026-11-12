@@ -83,6 +83,10 @@ until that runs, `select("*")` simply returns no such field, the bio falls back 
 [AuthorBio](components/AuthorBio.tsx) renders nothing. Emptying the field in /admin hides the box — that is
 the intended switch, not a bug.
 
+`settings.instagram_url` works the same way: it ships as [supabase/add-instagram.sql](supabase/add-instagram.sql),
+the code falls back to the real profile until that runs, and `saveSettings` retries without the column on
+`PGRST204` so /admin keeps saving in the meantime. Instagram is in the footer and in the Organization `sameAs`.
+
 `subscribers` backs the email box at the bottom of every post
 ([SubscribeForm](components/SubscribeForm.tsx) → [newsletter/actions.ts](app/(site)/newsletter/actions.ts) →
 `/admin/subscribers`). Its RLS deliberately gives anon **insert only and no select**, so the mailing list can

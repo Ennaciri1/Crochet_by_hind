@@ -4,15 +4,15 @@ import { absoluteUrl, type SiteSettings } from "./site";
  * Structured data (JSON-LD) shared by several pages.
  *
  * The Organization block tells Google who publishes the site: its name, logo
- * and official profiles (Etsy, Pinterest). It is what Google uses for the
+ * and official profiles (Etsy, Pinterest, Instagram). It is what Google uses for the
  * publisher of every article and, in time, for a knowledge panel. Every page
  * that mentions the publisher embeds this same block with the same "@id", so
  * Google merges them into one entity.
  */
 export function organizationSchema(site: SiteSettings) {
-  const sameAs = [site.etsy, site.pinterest].filter(
+  const sameAs = [site.etsy, site.pinterest, site.instagram].filter(
     // Skip the placeholder links used before the owner fills in /admin/settings.
-    (url) => url && !/^https:\/\/www\.(etsy|pinterest)\.com\/?$/.test(url),
+    (url) => url && !/^https:\/\/www\.(etsy|pinterest|instagram)\.com\/?$/.test(url),
   );
   return {
     "@type": "Organization",

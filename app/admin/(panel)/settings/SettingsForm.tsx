@@ -60,6 +60,10 @@ export default function SettingsForm({ site }: { site: SiteSettings }) {
             <label htmlFor="pinterest_url">Pinterest URL</label>
             <input id="pinterest_url" name="pinterest_url" type="url" defaultValue={site.pinterest} />
           </div>
+          <div className="field">
+            <label htmlFor="instagram_url">Instagram URL</label>
+            <input id="instagram_url" name="instagram_url" type="url" defaultValue={site.instagram} />
+          </div>
         </section>
 
         <section className="panel">

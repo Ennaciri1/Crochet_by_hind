@@ -66,6 +66,7 @@ create table if not exists public.settings (
   contact_email           text not null default 'hello@example.com',
   etsy_url                text not null default 'https://www.etsy.com',
   pinterest_url           text not null default 'https://www.pinterest.com',
+  instagram_url           text not null default '',
   description             text not null default 'Free easy crochet patterns and tutorials in US terms: granny square cardigans, amigurumi, Christmas ornaments and home decor, plus printable PDFs on Etsy.',
   ads_enabled             boolean not null default true,
   adsense_client          text not null default '',

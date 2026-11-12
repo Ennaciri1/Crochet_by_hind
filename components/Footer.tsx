@@ -37,6 +37,13 @@ export default function Footer({ site, categories }: { site: SiteSettings; categ
                   Pinterest
                 </a>
               </li>
+              {site.instagram && (
+                <li>
+                  <a href={site.instagram} target="_blank" rel="noopener">
+                    Instagram
+                  </a>
+                </li>
+              )}
               <li>
                 <a href="/feed.xml">RSS feed</a>
               </li>

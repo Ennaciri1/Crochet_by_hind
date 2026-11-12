@@ -378,6 +378,7 @@ export async function saveSettings(_prev: FormState, formData: FormData): Promis
     author_bio: text(formData, "author_bio", 600),
     etsy_url: text(formData, "etsy_url", 500),
     pinterest_url: text(formData, "pinterest_url", 500),
+    instagram_url: text(formData, "instagram_url", 500),
     description: text(formData, "description", 500),
     ads_enabled: formData.get("ads_enabled") === "on",
     adsense_client: text(formData, "adsense_client", 100),
@@ -386,6 +387,18 @@ export async function saveSettings(_prev: FormState, formData: FormData): Promis
   };
 
   const { error } = await supabase.from("settings").update(settings).eq("id", 1);
+  if (error?.code === "PGRST204") {
+    // The instagram_url column was added after the first deploy. Until
+    // supabase/add-instagram.sql has run, save everything else and say why.
+    const { instagram_url: _skipped, ...rest } = settings;
+    const retry = await supabase.from("settings").update(rest).eq("id", 1);
+    if (retry.error) return { error: friendlyError(retry.error.code, retry.error.message) };
+    refreshPublicPages();
+    return {
+      error:
+        "Everything was saved except the Instagram link. To make it editable, open Supabase → SQL Editor, paste the file supabase/add-instagram.sql and click Run.",
+    };
+  }
   if (error) return { error: friendlyError(error.code, error.message) };
 
   refreshPublicPages();
