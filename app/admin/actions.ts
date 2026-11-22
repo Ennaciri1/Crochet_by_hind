@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/admin";
 import { difficulties, getCategories } from "@/lib/categories";
 import { slugify } from "@/lib/markdown";
 import type { StaticPageSlug } from "@/lib/pages";
@@ -19,19 +20,6 @@ import { parseFaq } from "@/lib/utils";
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
-
-/** Returns a Supabase client for the logged-in admin, or redirects to login. */
-async function requireAdmin() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
-
-  const { data: isAdmin } = await supabase.rpc("is_admin");
-  if (!isAdmin) throw new Error("This account is not an admin.");
-  return supabase;
-}
 
 /** After any change, refresh every public page (home, categories, posts, sitemap). */
 function refreshPublicPages() {

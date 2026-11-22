@@ -79,6 +79,10 @@ Their servers may be located outside your own country, including in the United S
 
 Contact messages are deleted once they are no longer needed. You can ask us at any time to access, correct or delete the personal data we hold about you by writing to [hello@example.com](mailto:hello@example.com). Depending on where you live (for example under the GDPR or the CCPA), you may have additional rights, including the right to complain to a data protection authority.
 
+## Comments and likes
+
+When you comment, we store the name and message you provide to moderate and publish the discussion. Approved comments and replies are public. No email address is required. Please do not post private information. We use a first-party cookie to remember your likes in this browser and a random visitor identifier to prevent duplicate likes and limit comment spam. This identifier is not used for advertising. You can request removal of your comments through our [contact page](/contact).
+
 ## External links
 
 Our posts link to other websites such as Etsy and Pinterest. Their own privacy policies apply when you visit them.

@@ -166,6 +166,16 @@ Bonus Pinterest : sur Pinterest (compte professionnel) → **Paramètres** → *
 
 ---
 
+## Interactions : j’aime, partage et commentaires
+
+Chaque article propose un cœur avec compteur, un partage natif sur mobile (ou WhatsApp, Facebook et copie du lien), et une discussion avec réponses. Aucun compte lecteur ni adresse e-mail n’est nécessaire. Un cookie propre au site mémorise les j’aime par navigateur ; les compteurs viennent de la base de données.
+
+**Activation sur un site existant :** ouvrez le projet Supabase du blog → SQL Editor → New query, collez tout le fichier `supabase/add-community.sql`, puis cliquez Run. Le script peut être relancé sans supprimer les interactions. Il ajoute aussi une explication à la page de confidentialité. Pour une nouvelle installation, ce bloc figure déjà dans `schema.sql`.
+
+Dans **Admin → Comments**, validez les commentaires en attente, masquez les messages indésirables et répondez avec le badge Designer. Les messages des lecteurs attendent votre validation ; vos réponses sont publiées immédiatement. Masquer un commentaire masque aussi ses réponses sur le blog. Les pages des articles conservent leur cache : les interactions sont chargées séparément.
+
+`npm test` vérifie les fonctions et droits d’accès dans une base PostgreSQL locale en mémoire, sans toucher au site.
+
 ## 6. Google AdSense
 
 > Conseil : publiez au moins **15 à 20 articles** de qualité, avec vos propres photos, avant de postuler.
