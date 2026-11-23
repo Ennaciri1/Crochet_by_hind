@@ -10,6 +10,7 @@ import Lightbox from "@/components/Lightbox";
 import PatternCard from "@/components/PatternCard";
 import PinterestFollow from "@/components/PinterestFollow";
 import { PostGrid } from "@/components/PostCard";
+import PostCommunity, { CommunityActions, CommunityDiscussion } from "@/components/PostCommunity";
 import SubscribeForm from "@/components/SubscribeForm";
 import YarnBall from "@/components/YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
@@ -132,6 +133,7 @@ export default async function PostPage({ params }: Props) {
     : null;
 
   return (
+    <PostCommunity key={post.id} postId={post.id} title={post.title} url={url}>
     <article className="wrap" style={yarnVars(category?.color)}>
       <JsonLd data={article} />
       {howTo && <JsonLd data={howTo} />}
@@ -209,6 +211,8 @@ export default async function PostPage({ params }: Props) {
           Save to Pinterest
         </a>
       </div>
+
+      <CommunityActions />
 
       {/* On a wide screen this becomes two columns: the article and a sticky
           sign-up box. Below 1180px it collapses back to one column and the box
@@ -291,6 +295,7 @@ export default async function PostPage({ params }: Props) {
             ))}
           </section>
         )}
+        <CommunityDiscussion />
         </div>
 
         {/* 9. Email sign-up. Sticky beside the article on a wide screen, at the
@@ -313,5 +318,6 @@ export default async function PostPage({ params }: Props) {
       {/* Tap any step photo to see it full size. */}
       <Lightbox />
     </article>
+    </PostCommunity>
   );
 }
