@@ -176,6 +176,16 @@ Dans **Admin → Comments**, validez les commentaires en attente, masquez les me
 
 `npm test` vérifie les fonctions et droits d’accès dans une base PostgreSQL locale en mémoire, sans toucher au site.
 
+## Pages produit et brouillons
+
+**Admin → Products** permet de modifier la fiche Hearthside (texte, six images, vidéo, FAQ, SEO et image Pinterest 2:3), puis de l'ouvrir en aperçu privé. La fiche réutilise la table `posts` et ses droits existants, avec le tag réservé `product-landing` : aucune migration SQL n'est nécessaire. Les articles, le flux RSS et les catégories excluent ces fiches pour éviter un doublon sous `/blog/`.
+
+La publication exige une confirmation explicite du tricotage physique et de la vérification de l'édition finale. Le brouillon reste en 404 sur l'URL publique, hors navigation, sitemap et partage Pinterest. Pour l'aperçu local uniquement : `PRODUCT_LOCAL_PREVIEW=true npm run dev -- --hostname 127.0.0.1 --port 3100`. Ce mode n'existe pas en production ; les aperçus en production exigent le compte admin. Le PDF payant n'est jamais copié dans les fichiers publics. Le fichier fourni contient **6 pages**, et non les 9 annoncées dans le brief ; les dimensions et quantités ne sont pas présentées comme vérifiées.
+
+Pour préparer le brouillon initial : `node scripts/prepare-gnome-draft.mjs`, puis `npm run import:posts -- --file import/hearthside-shelf-gnome-posts.json` (aperçu) et la même commande avec `--apply` (création en brouillon uniquement). Un doublon est ignoré. La copie d'origine est dans `data/products/hearthside-shelf-gnome.json` ; le plan des trois articles de soutien est à côté et visible dans l'éditeur.
+
+Les cinq événements demandés sont raccordés aux balises GA4 existantes **uniquement après consentement analytics explicite** ; aucun compte ni identifiant GA4 n'est inventé. Les événements Vercel sont activables via `NEXT_PUBLIC_VERCEL_CUSTOM_EVENTS=true` sur un abonnement Pro/Enterprise. Les aperçus privés n'envoient aucun événement produit. `click_etsy_buy` mesure un clic sortant, jamais une vente. Sans collecteur compatible configuré, le suivi est prêt mais aucune collecte de ces événements n'est annoncée comme active.
+
 ## 6. Google AdSense
 
 > Conseil : publiez au moins **15 à 20 articles** de qualité, avec vos propres photos, avant de postuler.

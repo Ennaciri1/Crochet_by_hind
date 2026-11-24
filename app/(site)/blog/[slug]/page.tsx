@@ -11,6 +11,7 @@ import PatternCard from "@/components/PatternCard";
 import PinterestFollow from "@/components/PinterestFollow";
 import { PostGrid } from "@/components/PostCard";
 import PostCommunity, { CommunityActions, CommunityDiscussion } from "@/components/PostCommunity";
+import ProductRecommendations from "@/components/products/ProductRecommendations";
 import SubscribeForm from "@/components/SubscribeForm";
 import YarnBall from "@/components/YarnBall";
 import { getCategory, yarnVars } from "@/lib/categories";
@@ -295,6 +296,7 @@ export default async function PostPage({ params }: Props) {
             ))}
           </section>
         )}
+        <ProductRecommendations context={`${post.title} ${post.tags.join(" ")}`} />
         <CommunityDiscussion />
         </div>
 

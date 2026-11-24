@@ -2,14 +2,14 @@ import Link from "next/link";
 import type { Category } from "@/lib/categories";
 import type { SiteSettings } from "@/lib/site";
 
-export default function Footer({ site, categories }: { site: SiteSettings; categories: Category[] }) {
+export default function Footer({ site, categories, hasProducts = false }: { site: SiteSettings; categories: Category[]; hasProducts?: boolean }) {
   return (
     <footer className="site-footer">
       <div className="wrap">
         <div className="footer-grid">
           <div>
             <h2>{site.name}</h2>
-            <p>Free crochet patterns written in US terms, tested and photographed with love by {site.author}.</p>
+            <p>Crochet patterns, tutorials and little things to make with yarn, by {site.author}.</p>
           </div>
           <div>
             <h2>Patterns</h2>
@@ -17,6 +17,7 @@ export default function Footer({ site, categories }: { site: SiteSettings; categ
               <li>
                 <Link href="/blog">All posts</Link>
               </li>
+              {hasProducts && <li><Link href="/patterns">Digital PDF patterns</Link></li>}
               {categories.map((c) => (
                 <li key={c.slug}>
                   <Link href={`/category/${c.slug}`}>{c.name}</Link>

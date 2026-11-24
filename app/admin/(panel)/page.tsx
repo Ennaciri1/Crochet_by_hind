@@ -23,6 +23,7 @@ export default async function AdminPostsPage({ searchParams }: { searchParams: P
     supabase
       .from("posts")
       .select("id, slug, title, category, status, published_at, updated_at")
+      .not("tags", "cs", "{product-landing}")
       .order("updated_at", { ascending: false }),
     getCategories(),
   ]);
