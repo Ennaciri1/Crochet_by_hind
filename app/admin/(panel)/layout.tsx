@@ -47,7 +47,6 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <div className="wrap">
           <nav aria-label="Admin">
             <Link href="/admin">Posts</Link>
-            <Link href="/admin/products">Products</Link>
             <Link href="/admin/posts/new">+ New post</Link>
             <Link href="/admin/import">Import</Link>
             <Link href="/admin/messages">Messages</Link>

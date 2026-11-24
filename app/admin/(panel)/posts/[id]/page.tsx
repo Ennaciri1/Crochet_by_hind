@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
-import { PRODUCT_TAG } from "@/lib/product-model";
+import { notFound } from "next/navigation";
 import { getCategories } from "@/lib/categories";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Post } from "@/lib/types";
@@ -23,7 +22,6 @@ export default async function EditPostPage({ params, searchParams }: Props) {
     getCategories(),
   ]);
   if (!data) notFound();
-  if ((data as Post).tags.includes(PRODUCT_TAG)) redirect(`/admin/products/${id}`);
 
   // key: re-mount the editor after each save so it shows the fresh data
   return <PostEditor key={(data as Post).updated_at} post={data as Post} saved={saved} categories={categories} />;

@@ -7,12 +7,10 @@ export default function Header({
   siteName,
   categories,
   pinterest = "",
-  hasProducts = false,
 }: {
   siteName: string;
   categories: Category[];
   pinterest?: string;
-  hasProducts?: boolean;
 }) {
   return (
     <header className="site-header">
@@ -27,7 +25,6 @@ export default function Header({
         </Link>
         <nav className="main-nav" aria-label="Main">
           <Link href="/blog">Blog</Link>
-          {hasProducts && <Link href="/patterns">PDF patterns</Link>}
           {categories.map((c) => (
             <Link key={c.slug} href={`/category/${c.slug}`}>
               {c.name}

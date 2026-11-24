@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Category } from "@/lib/categories";
 import type { SiteSettings } from "@/lib/site";
 
-export default function Footer({ site, categories, hasProducts = false }: { site: SiteSettings; categories: Category[]; hasProducts?: boolean }) {
+export default function Footer({ site, categories }: { site: SiteSettings; categories: Category[] }) {
   return (
     <footer className="site-footer">
       <div className="wrap">
@@ -17,7 +17,6 @@ export default function Footer({ site, categories, hasProducts = false }: { site
               <li>
                 <Link href="/blog">All posts</Link>
               </li>
-              {hasProducts && <li><Link href="/patterns">Digital PDF patterns</Link></li>}
               {categories.map((c) => (
                 <li key={c.slug}>
                   <Link href={`/category/${c.slug}`}>{c.name}</Link>
