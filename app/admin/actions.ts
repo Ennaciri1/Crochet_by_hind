@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
-import { PRODUCT_TAG } from "@/lib/product-model";
 import { difficulties, getCategories } from "@/lib/categories";
 import { slugify } from "@/lib/markdown";
 import type { StaticPageSlug } from "@/lib/pages";
@@ -65,12 +64,6 @@ export async function savePost(_prev: FormState, formData: FormData): Promise<Fo
   const supabase = await requireAdmin();
 
   const id = text(formData, "id", 64);
-  if (id) {
-    const { data: existing, error } = await supabase.from("posts").select("tags").eq("id", id).maybeSingle();
-    if (error || !existing) return { error: "This post could not be loaded. Please try again." };
-    if (existing?.tags?.includes(PRODUCT_TAG)) return { error: "Edit this landing page in Products, where physical test-knitting is checked before publication." };
-  }
-  if (parseTags(text(formData, "tags", 1000)).tags.includes(PRODUCT_TAG)) return { error: "Manage product landing pages in Products." };
   const intent = text(formData, "intent", 20); // "publish" | "draft" | "unpublish"
   const title = text(formData, "title", 200);
   const slug = slugify(text(formData, "slug", 120) || title);
@@ -281,11 +274,6 @@ export async function importPosts(
 
     const categorySlug = capText(row.category, 40).toLowerCase();
     const category = categories.some((c) => c.slug.toLowerCase() === categorySlug) ? categorySlug : "free-patterns";
-
-    if (parseTags((row.tags ?? []).join(",")).tags.includes(PRODUCT_TAG)) {
-      results.push({ title, ok: false, kind: "failed", error: "Manage product landing pages in Products so their physical validation is checked.", slug, rowNumber });
-      continue;
-    }
 
     const status = normalizeStatus(row.status).value;
     // Same rule as savePost: an explicit date wins (a future one schedules the post),

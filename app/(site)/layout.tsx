@@ -3,7 +3,6 @@ import AdSenseScript from "@/components/AdSenseScript";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCategories } from "@/lib/categories";
-import { getPublishedProducts } from "@/lib/products";
 import { getSiteSettings } from "@/lib/site";
 
 /**
@@ -13,13 +12,13 @@ import { getSiteSettings } from "@/lib/site";
  * the owner's own visits to /admin are never counted. Results: Vercel → project → Analytics.
  */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [site, categories, products] = await Promise.all([getSiteSettings(), getCategories(), getPublishedProducts()]);
+  const [site, categories] = await Promise.all([getSiteSettings(), getCategories()]);
   return (
     <>
       <AdSenseScript client={site.adsEnabled ? site.adsenseClient : ""} />
-      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} hasProducts={products.length > 0} />
+      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} />
       <main id="main">{children}</main>
-      <Footer site={site} categories={categories} hasProducts={products.length > 0} />
+      <Footer site={site} categories={categories} />
       <Analytics />
     </>
   );

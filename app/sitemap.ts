@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { getCategories } from "@/lib/categories";
 import { parseImageMeta } from "@/lib/images";
 import { getAllPublishedSlugs } from "@/lib/posts";
-import { getPublishedProducts } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
 
 /**
@@ -26,7 +25,7 @@ export const dynamic = "force-dynamic";
  * real "last changed" dates: Google ignores lastmod when it is always "now".
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, categories, products] = await Promise.all([getAllPublishedSlugs(), getCategories(), getPublishedProducts()]);
+  const [posts, categories] = await Promise.all([getAllPublishedSlugs(), getCategories()]);
 
   // Newest change overall, and per category (posts come newest first).
   const latest = (list: typeof posts) =>
@@ -39,8 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: absoluteUrl("/"), lastModified: siteUpdated, changeFrequency: "daily", priority: 1 },
     { url: absoluteUrl("/blog"), lastModified: siteUpdated, changeFrequency: "daily", priority: 0.9 },
-    ...(products.length ? [{ url: absoluteUrl("/patterns"), changeFrequency: "weekly" as const, priority: 0.8 }] : []),
-    ...products.map(({ product, updated_at }) => ({ url: absoluteUrl(`/patterns/${product.slug}`), lastModified: new Date(updated_at), changeFrequency: "monthly" as const, priority: 0.9, images: [...product.gallery, product.pinImage].map((image) => absoluteUrl(image.src)) })),
     // Only categories that have posts: an empty one is marked noindex.
     ...categories
       .filter((c) => posts.some((p) => p.category === c.slug))

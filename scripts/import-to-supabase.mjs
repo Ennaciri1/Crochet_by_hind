@@ -9,14 +9,12 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { existsSync, readFileSync } from "node:fs";
-import { extname, join, resolve } from "node:path";
+import { extname, join } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const IMPORT_DIR = join(ROOT, "import");
 const PHOTOS_DIR = join(IMPORT_DIR, "photos");
-const fileIndex = process.argv.indexOf("--file");
-const POSTS_FILE = fileIndex >= 0 && process.argv[fileIndex + 1]
-  ? resolve(ROOT, process.argv[fileIndex + 1]) : join(IMPORT_DIR, "posts.json");
+const POSTS_FILE = join(IMPORT_DIR, "posts.json");
 const BUCKET = "images";
 const APPLY = process.argv.includes("--apply");
 
@@ -46,13 +44,11 @@ function fail(message) {
   process.exit(1);
 }
 
-if (fileIndex >= 0 && (!process.argv[fileIndex + 1] || process.argv[fileIndex + 1].startsWith("--"))) fail("--file requires the path to an import JSON file.");
-
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url) fail("NEXT_PUBLIC_SUPABASE_URL is missing from .env.local.");
 if (!key) fail("SUPABASE_SERVICE_ROLE_KEY is missing from .env.local (Supabase → Project Settings → API keys → service_role).");
-if (!existsSync(POSTS_FILE)) fail(`No import file at ${POSTS_FILE}.`);
+if (!existsSync(POSTS_FILE)) fail(`No file at import/posts.json.`);
 
 let posts;
 try {
@@ -112,7 +108,6 @@ for (const [i, row] of posts.entries()) {
     const category = str(row.category).toLowerCase();
     const difficulty = str(row.difficulty).toLowerCase();
     const status = str(row.status).toLowerCase() === "published" ? "published" : "draft";
-    if (list(row.tags).some((tag) => tag.toLowerCase() === "product-landing") && status !== "draft") throw new Error("Product landing pages must be imported as drafts and validated in Admin → Products.");
     if (category && !CATEGORIES.includes(category)) throw new Error(`unknown category "${category}"`);
     if (difficulty && !DIFFICULTIES.includes(difficulty)) throw new Error(`unknown difficulty "${difficulty}"`);
 
@@ -154,7 +149,7 @@ for (const [i, row] of posts.entries()) {
     }
     usedSlugs.add(slug);
     created++;
-    console.log(`✔ ${APPLY ? "created" : "ok     "}  ${label}  → /${post.tags.includes("product-landing") ? "patterns" : "blog"}/${slug}  [${post.category}, ${status}]`);
+    console.log(`✔ ${APPLY ? "created" : "ok     "}  ${label}  → /blog/${slug}  [${post.category}, ${status}]`);
   } catch (e) {
     failed++;
     console.log(`✖ failed   ${label}  (${e.message})`);
