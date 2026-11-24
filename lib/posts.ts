@@ -16,6 +16,7 @@ function publishedQuery(fields: string) {
   return supabase
     .from("posts")
     .select(fields)
+    .not("tags", "cs", "{product-landing}")
     .eq("status", "published")
     .lte("published_at", new Date().toISOString());
 }
@@ -72,6 +73,7 @@ export async function getPostsPage({
   let query = supabase
     .from("posts")
     .select(SUMMARY_FIELDS, { count: "exact" })
+    .not("tags", "cs", "{product-landing}")
     .eq("status", "published")
     .lte("published_at", new Date().toISOString());
 

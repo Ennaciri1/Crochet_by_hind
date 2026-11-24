@@ -1266,6 +1266,21 @@ textarea:focus { border-color: var(--accent); }
 
 .related { margin-top: 2.5rem; }
 
+.product-recommendations { margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+.product-recommendations p { margin: 0; }
+.product-recommendations a { color: var(--accent); font-weight: 600; }
+.product-admin-card { display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; }
+.product-admin-card > img { object-fit: cover; }
+.product-admin-card h2 { margin: 0; }
+.product-editor-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; }
+.product-editor-image, .product-editor-faq { min-width: 0; border: 1px solid var(--line); padding: 1rem; margin: 0 0 1rem; }
+.product-editor-image legend, .product-editor-faq legend { padding: 0 0.4rem; font-weight: 600; }
+.product-editor-image > img { object-fit: cover; margin-bottom: 0.75rem; }
+.product-validation-label { display: flex; gap: 0.6rem; align-items: flex-start; font-weight: 500; }
+.product-validation-label > input { margin-top: 0.3rem; flex-shrink: 0; }
+.product-content-plan summary { cursor: pointer; font-weight: 600; min-height: 44px; }
+.product-content-plan section { margin-top: 1.5rem; }
+
 /* ---------- Likes, sharing and reader conversations ---------- */
 .community-actions-wrap { margin: 0 auto 2rem; }
 .community-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }

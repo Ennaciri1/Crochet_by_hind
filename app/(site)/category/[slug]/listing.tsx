@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdSlot from "@/components/AdSlot";
+import ProductRecommendations from "@/components/products/ProductRecommendations";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { CategoryPills } from "@/components/CategoryNav";
 import Pagination from "@/components/Pagination";
@@ -63,6 +64,7 @@ export default async function CategoryListing({ slug, page }: { slug: string; pa
 
       {posts.length > 0 ? (
         <>
+          <ProductRecommendations context={slug} />
           <PostGrid posts={posts} />
           <Pagination page={page} totalPages={totalPages} basePath={`/category/${slug}`} />
           <AdSlot
