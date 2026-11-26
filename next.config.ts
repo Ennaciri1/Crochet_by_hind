@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
         hostname: supabaseImageHost(),
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "imgproxy.fourthwall.dev",
+        pathname: "/**",
+        search: "",
+      },
     ],
   },
   // The sitemap lives at /sitemap.xml only. These are the addresses people

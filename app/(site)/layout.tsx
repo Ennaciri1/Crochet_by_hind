@@ -3,6 +3,7 @@ import AdSenseScript from "@/components/AdSenseScript";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCategories } from "@/lib/categories";
+import { getFourthwallShopUrl } from "@/lib/fourthwall";
 import { getSiteSettings } from "@/lib/site";
 
 /**
@@ -16,7 +17,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <AdSenseScript client={site.adsEnabled ? site.adsenseClient : ""} />
-      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} />
+      <Header siteName={site.name} categories={categories} pinterest={site.pinterest} showShop={Boolean(getFourthwallShopUrl())} />
       <main id="main">{children}</main>
       <Footer site={site} categories={categories} />
       <Analytics />
