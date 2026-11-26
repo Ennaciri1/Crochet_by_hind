@@ -3,10 +3,12 @@ import Link from "next/link";
 import AdSlot from "@/components/AdSlot";
 import { CategoryTiles } from "@/components/CategoryNav";
 import CoverImage from "@/components/CoverImage";
+import FourthwallProducts from "@/components/FourthwallProducts";
 import JsonLd from "@/components/JsonLd";
 import { PostGrid } from "@/components/PostCard";
 import YarnBall from "@/components/YarnBall";
 import { getCategories, getCategory, yarnVars } from "@/lib/categories";
+import { getFourthwallProducts } from "@/lib/fourthwall";
 import { QUALITY_COVER } from "@/lib/images";
 import { getPostsPage, POSTS_PER_PAGE } from "@/lib/posts";
 import { organizationSchema } from "@/lib/schema";
@@ -29,10 +31,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   // One extra post: the newest is featured in the hero, the rest fill the grid.
-  const [{ posts }, categories, site] = await Promise.all([
+  const [{ posts }, categories, site, { products }] = await Promise.all([
     getPostsPage({ page: 1, perPage: POSTS_PER_PAGE + 1 }),
     getCategories(),
     getSiteSettings(),
+    getFourthwallProducts(),
   ]);
   const [newest, ...rest] = posts;
   const newestCategory = newest ? await getCategory(newest.category) : undefined;
@@ -126,6 +129,16 @@ export default async function HomePage() {
           <p className="empty">
             {newest ? "More patterns are on the hook. Come back soon!" : "No posts yet. Write your first one in /admin."}
           </p>
+        )}
+
+        {products.length > 0 && (
+          <section aria-labelledby="shop-preview-title">
+            <div className="section-head">
+              <h2 id="shop-preview-title">From the shop</h2>
+              <Link href="/shop">See all products</Link>
+            </div>
+            <FourthwallProducts products={products.slice(0, 3)} />
+          </section>
         )}
 
         <AdSlot
